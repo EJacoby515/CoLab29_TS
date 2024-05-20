@@ -1,5 +1,5 @@
 import React from 'react';
-import FloatingMenuButton from './components/FloatingMenuButton';
+import FloatingMenuButton from './FloatingMenuButton/FloatingMenuButton';
 
 const App: React.FC = () => {
   return <FloatingMenuButton />;
