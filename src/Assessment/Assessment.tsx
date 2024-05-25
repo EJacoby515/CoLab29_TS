@@ -9,17 +9,31 @@ import { faFaceSmileBeam as faFaceSmileBeamLine,
 
 const Assessment: React.FC = () => {
   const [journal, setJournal] = useState('');
-  const [smile, setSmile] = useState(false);
-  const [meh, setMeh] = useState(false);
-  const [frown, setFrown] = useState(false);
+  const [emoji, setEmoji] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setJournal(e.target.value);
   }
 
-  const submitGoal = () => {
-    console.log({journal})
-  } 
+  const submitAssessment = async (face:string) => {
+    console.log({journal});
+    const formattedDate = new Date().toISOString();
+    try {
+      const response = await new Promise((resolve, reject) => {
+        chrome.runtime.sendMessage({ action: "appendStorage", key: formattedDate, value: face}, (response) => {
+          if (chrome.runtime.lastError) {
+            reject(chrome.runtime.lastError);
+          } else {
+            resolve(response);
+          }
+        });
+      });
+      console.log(response);
+      } catch (error) {
+        console.error('Error:', error);
+      };
+  };
+
 
   const assessmentcontainerStyle = {
     position: 'fixed',
@@ -92,16 +106,16 @@ const Assessment: React.FC = () => {
               textAlign: 'center'
             }}>How did it go?</p>
         <div style={{...emojiContainerStyle}}>
-          <a style={{...emojiStyle, color: 'green'}} onClick={()=>{setSmile(true), setMeh(false), setFrown(false)}}>
-            <FontAwesomeIcon icon={smile ? faFaceSmileBeamSolid : faFaceSmileBeamLine}/></a>
-          <a style={{...emojiStyle, color: 'orange'}} onClick={()=>{setSmile(false), setMeh(true), setFrown(false)}}>
-            <FontAwesomeIcon icon={meh ? faFaceMehSolid : faFaceMehLine} /></a>
-          <a style={{...emojiStyle, color: 'red'}} onClick={()=>{setSmile(false), setMeh(false), setFrown(true)}}>
-            <FontAwesomeIcon icon={frown ? faFaceFrownSolid : faFaceFrownOpenLine} /></a>
+          <a style={{...emojiStyle, color: 'green'}} onClick={()=>{setEmoji('smile')}}>
+            <FontAwesomeIcon icon={emoji === 'smile' ? faFaceSmileBeamSolid : faFaceSmileBeamLine}/></a>
+          <a style={{...emojiStyle, color: 'orange'}} onClick={()=>{setEmoji('meh')}}>
+            <FontAwesomeIcon icon={emoji === 'meh' ? faFaceMehSolid : faFaceMehLine} /></a>
+          <a style={{...emojiStyle, color: 'red'}} onClick={()=>{setEmoji('frown')}}>
+            <FontAwesomeIcon icon={emoji === 'frown' ? faFaceFrownSolid : faFaceFrownOpenLine} /></a>
         </div>
         <p style={{...pStyle}}>Study Session reflections:</p>
         <textarea style={{...textareaStyle}} value={journal} onChange={handleChange}/>
-        <button style={{...editBtnStyle}} onClick={submitGoal}>Log Session</button>
+        <button style={{...editBtnStyle}} onClick={() => {submitAssessment(emoji)}}>Log Session</button>
       </div>
     </>
   );

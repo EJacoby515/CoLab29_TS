@@ -10,9 +10,16 @@ const FloatingMenuButton: React.FC = () => {
 
   const handleClick = async () => {
     setMenuOpen(!menuOpen);
+  };
+
+  const handlePencilClick = () => {
+    setPencilOpen(!pencilOpen);
+    };
+
+  const handleCalendarClick = async () => {
     try {
       const response = await new Promise((resolve, reject) => {
-        chrome.runtime.sendMessage({ action: "setStorage", data: { startedSession: new Date().toString() } }, (response) => {
+        chrome.runtime.sendMessage({ action: "getStorage" }, (response) => {
           if (chrome.runtime.lastError) {
             reject(chrome.runtime.lastError);
           } else {
@@ -21,14 +28,10 @@ const FloatingMenuButton: React.FC = () => {
         });
       });
       console.log(response);
-  } catch (error) {
-    console.error('Error:', error);
+      } catch (error) {
+        console.error('Error:', error);
+      };
   }
-  };
-
-  const handlePencilClick = () => {
-    setPencilOpen(!pencilOpen);
-  };
 
   const buttonStyle = {
     position: 'fixed',
@@ -92,7 +95,7 @@ const FloatingMenuButton: React.FC = () => {
               bottom: '90px',
               left: '90px',
             }}
-            onClick={() => alert('Calendar icon clicked!')}
+            onClick={handleCalendarClick}
           >
             <FontAwesomeIcon icon={faCalendarAlt} />
           </button>
