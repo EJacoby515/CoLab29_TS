@@ -2,12 +2,15 @@ import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBullseye, faPencilAlt, faCalendarAlt, faHourglassHalf } from '@fortawesome/free-solid-svg-icons';
 import GoalInput from '../GoalInput/GoalInput';
+import PomodoroTimer from '../PomodoroTimer/PomodoroTimer';
+import Assessment from '../Assessment/Assessment';
 
 const FloatingMenuButton: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [pencilOpen, setPencilOpen] = useState(false);
   const [showPomodoro, setShowPomodoro] = useState(false);
   const [IsTimerStarted, setIsTimerStarted] = useState(false);
+  const [showAssessment, setShowAssessment] = useState(false);
 
   const handleClick = async () => {
     setMenuOpen(!menuOpen);
@@ -17,6 +20,10 @@ const FloatingMenuButton: React.FC = () => {
 
   const handleTimerStart = () => {
     setIsTimerStarted(true);
+  }
+
+  const handleTimerFinish = () => {
+    setShowAssessment(true);
   }
 
   const handlePomodoroClick = () => {
@@ -130,9 +137,10 @@ const FloatingMenuButton: React.FC = () => {
           transform: IsTimerStarted ? 'scale(0.8)' : 'scale(1)',
           transition: 'all 0.8s ease-in-out',
           }}>
-          <PomodoroTimer onTimerStart={handleTimerStart} />
+          <PomodoroTimer onTimerStart={handleTimerStart} onTimerFinish={handleTimerFinish} />
         </div>
       )}
+      {showAssessment && <Assessment/>}
     </>
   );
 };

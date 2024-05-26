@@ -2,11 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 
-const PomodoroTimer: React.FC<{ onTimerStart:  () => void  }> = ({ onTimerStart}) => {
+const PomodoroTimer: React.FC<{ onTimerStart:  () => void; onTimerFinish: () => void;  }> = ({ onTimerStart, onTimerFinish}) => {
   const [time, setTime] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [halfwayAlertTriggered, setHalfwayAlertTriggered] = useState(false);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<number | null>(null);
 
   const startTimer = (minutes: number) => {
     setTime(minutes * 60);
@@ -17,7 +17,7 @@ const PomodoroTimer: React.FC<{ onTimerStart:  () => void  }> = ({ onTimerStart}
 
   const stopTimer = () => {
     if (timerRef.current) {
-      clearInterval(timerRef.current);
+      window.clearInterval(timerRef.current!);
     }
     setIsRunning(false);
   };
@@ -37,11 +37,11 @@ const PomodoroTimer: React.FC<{ onTimerStart:  () => void  }> = ({ onTimerStart}
 
   useEffect(() => {
     if (isRunning) {
-      timerRef.current = setInterval(() => {
+      timerRef.current = window.setInterval(() => {
         setTime((prevTime) => {
           if (prevTime <= 0) {
-            clearInterval(timerRef.current!);
-            alert('Time is up!');
+            window.clearInterval(timerRef.current!);
+            onTimerFinish();
             return 0;
           }
 
@@ -59,10 +59,10 @@ const PomodoroTimer: React.FC<{ onTimerStart:  () => void  }> = ({ onTimerStart}
 
     return () => {
       if (timerRef.current) {
-        clearInterval(timerRef.current);
+        window.clearInterval(timerRef.current);
       }
     };
-  }, [isRunning, halfwayAlertTriggered, time]);
+  }, [isRunning, halfwayAlertTriggered, time, onTimerFinish]);
 
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
