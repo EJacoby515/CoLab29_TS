@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "React TypeScript Chrome Extension",
+  "name": "Focus Companion Chrome Extension",
   "version": "1.0",
-  "description": "A Chrome extension with React and TypeScript.",
+  "description": "Study better with goal setting and review and timed sessions",
   "action": {
     "default_icon": {
       "16": "icon.png",
@@ -13,7 +13,7 @@
   "background": {
     "service_worker": "background.js"
   },
-  "permissions": ["activeTab", "scripting"],
+  "permissions": ["activeTab", "scripting", "storage"],
   "host_permissions": ["<all_urls>"],
   "content_scripts": [
     {

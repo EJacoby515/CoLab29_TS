@@ -13,13 +13,13 @@ const GoalInput: React.FC = () => {
 
   const goalcontainerStyle = {
     position: 'fixed',
-    bottom: '180px',
+    bottom: '450px',
     padding: '20px',
     right: '80px',
     zIndex: 1000,
     display: 'flex',
     flexDirection: 'column',
-    backgroundColor: 'rgba(0,0,0,0.8)',
+    backgroundColor: 'white',
     boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)'
   } as React.CSSProperties;
 
