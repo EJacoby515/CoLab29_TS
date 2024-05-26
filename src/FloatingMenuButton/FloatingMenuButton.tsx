@@ -2,14 +2,27 @@ import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBullseye, faPencilAlt, faCalendarAlt, faHourglassHalf } from '@fortawesome/free-solid-svg-icons';
 import GoalInput from '../GoalInput/GoalInput';
+import PomodoroTimer from '../PomodoroTimer/PomodoroTimer';
 
 const FloatingMenuButton: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [pencilOpen, setPencilOpen] = useState(false);
+  const [showPomodoro, setShowPomodoro] = useState(false);
+  const [IsTimerStarted, setIsTimerStarted] = useState(false);
 
   const handleClick = () => {
     setMenuOpen(!menuOpen);
+    setPencilOpen(false);
+    setShowPomodoro(false);
   };
+
+  const handleTimerStart = () => {
+    setIsTimerStarted(true);
+  }
+
+  const handlePomodoroClick = () => {
+    setShowPomodoro(!showPomodoro);
+  }
 
   const handlePencilClick = () => {
     setPencilOpen(!pencilOpen);
@@ -63,7 +76,7 @@ const FloatingMenuButton: React.FC = () => {
             style={{
               ...iconButtonStyle,
               bottom: '90px',
-              right: '90px',
+              right: '20px',
             }}
             onClick={handlePencilClick}
           >
@@ -73,7 +86,7 @@ const FloatingMenuButton: React.FC = () => {
             style={{
               ...iconButtonStyle,
               bottom: '90px',
-              left: '90px',
+              right: '90px',
             }}
             onClick={() => alert('Calendar icon clicked!')}
           >
@@ -82,14 +95,25 @@ const FloatingMenuButton: React.FC = () => {
           <button
             style={{
               ...iconButtonStyle,
-              top: '90px',
+              bottom:'20px',
               right: '90px',
             }}
-            onClick={() => alert('Timer icon clicked!')}
+            onClick={handlePomodoroClick}
           >
             <FontAwesomeIcon icon={faHourglassHalf} />
           </button>
         </>
+      )}
+      {showPomodoro && (
+        <div style={{ 
+          position: 'fixed', 
+          bottom: IsTimerStarted ? '110px' : '160px',
+          right: IsTimerStarted ? '0px' : '160px',
+          transform: IsTimerStarted ? 'scale(0.8)' : 'scale(1)',
+          transition: 'all 0.8s ease-in-out',
+          }}>
+          <PomodoroTimer onTimerStart={handleTimerStart} />
+        </div>
       )}
     </>
   );

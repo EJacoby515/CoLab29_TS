@@ -19,7 +19,7 @@ const GoalInput: React.FC = () => {
     zIndex: 1000,
     display: 'flex',
     flexDirection: 'column',
-    backgroundColor: 'white',
+    backgroundColor: 'rgba(0,0,0,0.8)',
     boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)'
   } as React.CSSProperties;
 
