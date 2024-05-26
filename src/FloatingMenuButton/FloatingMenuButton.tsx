@@ -2,18 +2,36 @@ import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBullseye, faPencilAlt, faCalendarAlt, faHourglassHalf } from '@fortawesome/free-solid-svg-icons';
 import GoalInput from '../GoalInput/GoalInput';
+import Assessment from '../Assessment/Assessment';
 
 const FloatingMenuButton: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [pencilOpen, setPencilOpen] = useState(false);
 
-  const handleClick = () => {
+  const handleClick = async () => {
     setMenuOpen(!menuOpen);
   };
 
   const handlePencilClick = () => {
     setPencilOpen(!pencilOpen);
-  };
+    };
+
+  const handleCalendarClick = async () => {
+    try {
+      const response = await new Promise((resolve, reject) => {
+        chrome.runtime.sendMessage({ action: "getStorage" }, (response) => {
+          if (chrome.runtime.lastError) {
+            reject(chrome.runtime.lastError);
+          } else {
+            resolve(response);
+          }
+        });
+      });
+      console.log(response);
+      } catch (error) {
+        console.error('Error:', error);
+      };
+  }
 
   const buttonStyle = {
     position: 'fixed',
@@ -58,7 +76,9 @@ const FloatingMenuButton: React.FC = () => {
       </button>
       {menuOpen && (
         <>
-          {pencilOpen && (<GoalInput/>)}
+          {pencilOpen && (
+              <><GoalInput/>
+              <Assessment/></>)}
           <button
             style={{
               ...iconButtonStyle,
@@ -75,7 +95,7 @@ const FloatingMenuButton: React.FC = () => {
               bottom: '90px',
               left: '90px',
             }}
-            onClick={() => alert('Calendar icon clicked!')}
+            onClick={handleCalendarClick}
           >
             <FontAwesomeIcon icon={faCalendarAlt} />
           </button>
