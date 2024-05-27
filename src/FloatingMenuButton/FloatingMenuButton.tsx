@@ -24,6 +24,17 @@ const FloatingMenuButton: React.FC = () => {
 
   const handleTimerFinish = () => {
     setShowAssessment(true);
+    setShowPomodoro(false);
+    setIsTimerStarted(false);
+  }
+
+  const handleTimerStop = () => {
+    setIsTimerStarted(false);
+  }
+
+  const handleAssessmentSubmit =() => {
+    setShowAssessment(false);
+    setShowPomodoro(false);
   }
 
   const handlePomodoroClick = () => {
@@ -96,7 +107,7 @@ const FloatingMenuButton: React.FC = () => {
         <>
           {pencilOpen && (
               <><GoalInput/>
-              <Assessment/></>)}
+              </>)}
           <button
             style={{
               ...iconButtonStyle,
@@ -137,10 +148,10 @@ const FloatingMenuButton: React.FC = () => {
           transform: IsTimerStarted ? 'scale(0.8)' : 'scale(1)',
           transition: 'all 0.8s ease-in-out',
           }}>
-          <PomodoroTimer onTimerStart={handleTimerStart} onTimerFinish={handleTimerFinish} />
+          <PomodoroTimer onTimerStart={handleTimerStart} onTimerFinish={handleTimerFinish} onTimerStop={handleTimerStop} />
         </div>
       )}
-      {showAssessment && <Assessment/>}
+      {showAssessment && <Assessment onAssessmentSubmit={handleAssessmentSubmit}/>}
     </>
   );
 };

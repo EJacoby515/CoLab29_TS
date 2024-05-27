@@ -7,7 +7,7 @@ import { faFaceSmileBeam as faFaceSmileBeamLine,
           faFaceMeh as faFaceMehLine, 
           faFaceFrownOpen as faFaceFrownOpenLine} from '@fortawesome/free-regular-svg-icons';
 
-const Assessment: React.FC = () => {
+const Assessment: React.FC<{ onAssessmentSubmit: () => void }> = ({onAssessmentSubmit}) => {
   const [journal, setJournal] = useState('');
   const [emoji, setEmoji] = useState('');
 
@@ -29,6 +29,7 @@ const Assessment: React.FC = () => {
         });
       });
       console.log(response);
+      onAssessmentSubmit();
       } catch (error) {
         console.error('Error:', error);
       };
@@ -115,7 +116,7 @@ const Assessment: React.FC = () => {
         </div>
         <p style={{...pStyle}}>Study Session reflections:</p>
         <textarea style={{...textareaStyle}} value={journal} onChange={handleChange}/>
-        <button style={{...editBtnStyle}} onClick={() => {submitAssessment(emoji)}}>Log Session</button>
+        <button style={{...editBtnStyle, fontSize: '10px'}} onClick={() => {submitAssessment(emoji)}}>Log Session</button>
       </div>
     </>
   );

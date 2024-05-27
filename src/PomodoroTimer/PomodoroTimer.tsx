@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 
-const PomodoroTimer: React.FC<{ onTimerStart:  () => void; onTimerFinish: () => void;  }> = ({ onTimerStart, onTimerFinish}) => {
+const PomodoroTimer: React.FC<{ onTimerStart:  () => void; onTimerFinish: () => void; onTimerStop: () => void }> = ({ onTimerStart, onTimerFinish, onTimerStop}) => {
   const [time, setTime] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [halfwayAlertTriggered, setHalfwayAlertTriggered] = useState(false);
@@ -20,6 +20,7 @@ const PomodoroTimer: React.FC<{ onTimerStart:  () => void; onTimerFinish: () => 
       window.clearInterval(timerRef.current!);
     }
     setIsRunning(false);
+    onTimerStop();
   };
 
   const resetTimer = () => {
