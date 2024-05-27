@@ -4,18 +4,21 @@ import { faBullseye, faPencilAlt, faCalendarAlt, faHourglassHalf } from '@fortaw
 import GoalInput from '../GoalInput/GoalInput';
 import PomodoroTimer from '../PomodoroTimer/PomodoroTimer';
 import Assessment from '../Assessment/Assessment';
+import Calendar from '../Calendar/Calendar';
 
 const FloatingMenuButton: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [pencilOpen, setPencilOpen] = useState(false);
+  const [showPencil, setShowPencil] = useState(false);
+  const [showCalendar, setShowCalendar] = useState(false);
   const [showPomodoro, setShowPomodoro] = useState(false);
   const [IsTimerStarted, setIsTimerStarted] = useState(false);
   const [showAssessment, setShowAssessment] = useState(false);
 
   const handleClick = async () => {
     setMenuOpen(!menuOpen);
-    setPencilOpen(false);
+    setShowPencil(false);
     setShowPomodoro(false);
+    setShowCalendar(false);
   };
 
   const handleTimerStart = () => {
@@ -31,10 +34,11 @@ const FloatingMenuButton: React.FC = () => {
   }
 
   const handlePencilClick = () => {
-    setPencilOpen(!pencilOpen);
+    setShowPencil(!showPencil);
     };
 
   const handleCalendarClick = async () => {
+    setShowCalendar(!showCalendar);
     try {
       const response = await new Promise((resolve, reject) => {
         chrome.runtime.sendMessage({ action: "getStorage" }, (response) => {
@@ -94,7 +98,7 @@ const FloatingMenuButton: React.FC = () => {
       </button>
       {menuOpen && (
         <>
-          {pencilOpen && (
+          {showPencil && (
               <><GoalInput/>
               <Assessment/></>)}
           <button
@@ -141,6 +145,7 @@ const FloatingMenuButton: React.FC = () => {
         </div>
       )}
       {showAssessment && <Assessment/>}
+      {showCalendar && <Calendar/>}
     </>
   );
 };
