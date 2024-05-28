@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Focus Companion Chrome Extension",
+  "name": "deepFocus Chrome Extension",
   "version": "1.0",
   "description": "Study better with goal setting and review and timed sessions",
   "action": {

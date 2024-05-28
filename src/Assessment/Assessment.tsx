@@ -74,7 +74,7 @@ const Assessment: React.FC<{ onAssessmentSubmit: () => void }> = ({onAssessmentS
 
   const editBtnStyle = {
     color: 'white',
-    backgroundColor: '#007bff',
+    backgroundColor: '#3a2723',
     borderRadius: '4px',
     padding: '0px 12px',
     height: '32px',

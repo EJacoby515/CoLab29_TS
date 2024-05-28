@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBullseye, faPencilAlt, faCalendarAlt, faHourglassHalf } from '@fortawesome/free-solid-svg-icons';
+import { faX, faCube, faPencilAlt, faCalendarAlt, faHourglassHalf } from '@fortawesome/free-solid-svg-icons';
 import GoalInput from '../GoalInput/GoalInput';
 import PomodoroTimer from '../PomodoroTimer/PomodoroTimer';
 import Assessment from '../Assessment/Assessment';
@@ -68,7 +68,7 @@ const FloatingMenuButton: React.FC = () => {
     right: '20px',
     width: '60px',
     height: '60px',
-    backgroundColor: '#007bff',
+    backgroundColor: '#3a2723',
     color: '#fff',
     border: 'none',
     borderRadius: '50%',
@@ -85,7 +85,7 @@ const FloatingMenuButton: React.FC = () => {
     position: 'fixed',
     width: '50px',
     height: '50px',
-    backgroundColor: '#007bff',
+    backgroundColor: '#3a2723',
     color: '#fff',
     border: 'none',
     borderRadius: '10px',
@@ -101,7 +101,7 @@ const FloatingMenuButton: React.FC = () => {
   return (
     <>
       <button style={buttonStyle} onClick={handleClick}>
-        <FontAwesomeIcon icon={faBullseye} />
+        <FontAwesomeIcon icon={menuOpen ? faX : faCube} />
       </button>
       {menuOpen && (
         <>

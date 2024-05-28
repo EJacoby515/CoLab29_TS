@@ -1,15 +1,18 @@
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlay, faX, faRotateLeft } from '@fortawesome/free-solid-svg-icons';
 import React, { useState, useEffect, useRef } from 'react';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 
 const PomodoroTimer: React.FC<{ onTimerStart:  () => void; onTimerFinish: () => void; onTimerStop: () => void }> = ({ onTimerStart, onTimerFinish, onTimerStop}) => {
-  const [time, setTime] = useState(0);
+  const [time, setTime] = useState(1500);
   const [isRunning, setIsRunning] = useState(false);
+  const [isCustomTime, setIsCustomTime] = useState(false);
+  const [customTime, setCustomTime] = useState('');
   const [halfwayAlertTriggered, setHalfwayAlertTriggered] = useState(false);
   const timerRef = useRef<number | null>(null);
 
-  const startTimer = (minutes: number) => {
-    setTime(minutes * 60);
+  const startTimer = () => {
     setIsRunning(true);
     setHalfwayAlertTriggered(false);
     onTimerStart();
@@ -25,7 +28,7 @@ const PomodoroTimer: React.FC<{ onTimerStart:  () => void; onTimerFinish: () => 
 
   const resetTimer = () => {
     stopTimer();
-    setTime(0);
+    setTime(1500);
   };
 
   const incrementTimer = () => {
@@ -35,6 +38,18 @@ const PomodoroTimer: React.FC<{ onTimerStart:  () => void; onTimerFinish: () => 
   const decrementTimer = () => {
     setTime((prevTime) => Math.max(prevTime - 300, 0));
   };
+
+  const handleCustomTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCustomTime(e.target.value);
+  }
+
+  const handleCustomTimeSubmit = () => {
+    const customTimeSeconds = parseInt(customTime, 10) * 60;
+    if (!isNaN(customTimeSeconds) && customTimeSeconds  > 0 ) {
+      setTime(customTimeSeconds);
+      setIsCustomTime(false);
+    }
+  }
 
   useEffect(() => {
     if (isRunning) {
@@ -46,7 +61,7 @@ const PomodoroTimer: React.FC<{ onTimerStart:  () => void; onTimerFinish: () => 
             return 0;
           }
 
-          const halfwayTime = (prevTime - 1) === (time / 2);
+          const halfwayTime = prevTime - 1 === Math.floor(time / 2);
 
           if (!halfwayAlertTriggered && halfwayTime) {
             alert('Halfway there! How do you feel about what you\'re studying? Do you want to keep going, start over, or take a short break?');
@@ -76,40 +91,77 @@ const PomodoroTimer: React.FC<{ onTimerStart:  () => void; onTimerFinish: () => 
     width: '40px',
     height: '40px',
     margin: '0 5px',
-    backgroundColor: '#007bff',
+    backgroundColor: '#3A2723',
     color: 'white',
     border: 'none',
     cursor: 'pointer',
   };
 
+  const customTimeInputStyle: React.CSSProperties = {
+    padding: '8px',
+    borderRadius: '4px',
+    border: '1px solid #3A2723',
+    marginRight: '8px',
+    width: '80px',
+    textAlign: 'center',
+    fontSize: ' 16px',
+  };
+  
+  const customTimeButtonStyle: React.CSSProperties = {
+    padding: '8px 16px',
+    borderRadius: '4px',
+    backgroundColor: '#3A2723',
+    color: 'white',
+    border: 'none',
+    cursor: 'pointer',
+    fontSize: ' 16px',
+  };
+
 
   return (
-    <div style={{ textAlign: 'center', padding: '10px', borderRadius: '8px', backgroundColor: 'rgba(0,0,0,0.8)'}}>
-      <h2>Co.Lab29 Timer</h2>
+    <div style={{ textAlign: 'center', padding: '10px', borderRadius: '8px', backgroundColor: '#a8a8a8' }}>
+      <h2>deepFocus Timer</h2>
       <div style={{ position: 'relative', width: '200px', margin: '0 auto' }}>
-        <CircularProgressbar
-          value={(time % 3600) / 36}
-          text={formatTime(time)}
-          styles={buildStyles({
-            textColor: '#fff',
-            pathColor: '#007bff',
-            trailColor: '#d6d6d6',
-          })}
-        />
-        <button 
-        style = {{
-          position: 'absolute',
-          top: '0px',
-          left: '0px',
-          ...buttonStyle,
-          width: '30px',
-          height:'30px',
+        {isCustomTime ? (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
+            <input
+              type="number"
+              value={customTime}
+              onChange={handleCustomTimeChange}
+              placeholder="Enter minutes"
+              style={customTimeInputStyle as React.CSSProperties}
+            />
+            <button onClick={handleCustomTimeSubmit} style={customTimeButtonStyle}>
+              Set
+            </button>
+          </div>
+        ) : (
+          <div onClick={() => setIsCustomTime(true)}>
+          <CircularProgressbar
+            value={(time % 3600) / 60}
+            text={formatTime(time)}
+            styles={buildStyles({
+              textColor: '#3A2723',
+              pathColor: '#3A2723',
+              trailColor: '#f6f1f0',
+            })}
+          />
+          </div>
+        )}
+        <button
+          style={{
+            position: 'absolute',
+            top: '0px',
+            left: '0px',
+            ...buttonStyle,
+            width: '30px',
+            height: '30px',
           }}
           onClick={decrementTimer}
-          >
-            -5
-          </button>
-          <button
+        >
+          -5
+        </button>
+        <button
           style={{
             position: 'absolute',
             top: '0px',
@@ -119,39 +171,27 @@ const PomodoroTimer: React.FC<{ onTimerStart:  () => void; onTimerFinish: () => 
             height: '30px',
           }}
           onClick={incrementTimer}
-          >
-            +5
+        >
+          +5
+        </button>
+      </div>
+      {!isRunning && (
+        <div style={{ marginTop: '20px' }}>
+          <button style={buttonStyle} onClick={startTimer}>
+            <FontAwesomeIcon  icon = {faPlay} />
           </button>
-          </div>
-          {!isRunning && (
-          <div style = {{ marginTop:'20px' }}>
-            <button
-            style = {
-              buttonStyle
-            }
-            onClick={() => startTimer(30)}
-            >
-              30
-            </button>
-            <button
-            style={buttonStyle}
-            onClick={() => startTimer(45)}
-            >
-              45
-            </button>
-          </div>
-        )}
-          <div 
-          style = {{ marginTop: '20px',
-            display: 'flex',
-            justifyContent: 'space-between',
-            borderRadius: '50%'
-          }}>
-            <button style = {{...buttonStyle, fontSize: '10px'}} onClick ={stopTimer}>Stop</button>
-            <button style = {{...buttonStyle, fontSize: '10px'}} onClick ={resetTimer}>Reset</button>
-          </div>
-          </div>
-    );
-  };
+        </div>
+      )}
+      <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'space-between', borderRadius: '50%' }}>
+        <button style={buttonStyle} onClick={stopTimer}>
+          <FontAwesomeIcon icon = {faX} />
+        </button>
+        <button style={buttonStyle} onClick={resetTimer}>
+          <FontAwesomeIcon icon = {faRotateLeft} />
+        </button>
+      </div>
+    </div>
+  );
+};
 
 export default PomodoroTimer;
