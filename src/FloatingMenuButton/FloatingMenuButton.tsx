@@ -13,8 +13,26 @@ const FloatingMenuButton: React.FC = () => {
   const [showPomodoro, setShowPomodoro] = useState(false);
   const [IsTimerStarted, setIsTimerStarted] = useState(false);
   const [showAssessment, setShowAssessment] = useState(false);
+  const [userStatus, setUserStatus] = useState('onboarding')
 
   const handleClick = async () => {
+    try {
+      const response: {} = await new Promise((resolve, reject) => {
+        chrome.runtime.sendMessage({ action: "getStorage"}, (response) => {
+          if (chrome.runtime.lastError) {
+            reject(chrome.runtime.lastError);
+          } else {
+            resolve(response);
+          }
+        });
+      });
+      console.log(response);
+      // if (response.currentGoal !== null) {
+      //   setUserStatus('onboarding')
+      // }
+      } catch (error) {
+        console.error('Error:', error);
+      }; 
     setMenuOpen(!menuOpen);
     setShowPencil(false);
     setShowPomodoro(false);
@@ -99,8 +117,7 @@ const FloatingMenuButton: React.FC = () => {
       {menuOpen && (
         <>
           {showPencil && (
-              <><GoalInput/>
-              <Assessment/></>)}
+              <GoalInput/>)}
           <button
             style={{
               ...iconButtonStyle,

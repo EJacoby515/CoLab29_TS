@@ -16,12 +16,12 @@ const Assessment: React.FC = () => {
     setJournal(e.target.value);
   }
 
-  const submitAssessment = async (face:string) => {
+  const submitAssessment = async (anemoji:string) => {
     console.log({journal});
     const formattedDate = new Date().toISOString();
     try {
       const response = await new Promise((resolve, reject) => {
-        chrome.runtime.sendMessage({ action: "appendStorage", key: formattedDate, value: face}, (response) => {
+        chrome.runtime.sendMessage({ action: "appendStorage", key: formattedDate, value: anemoji}, (response) => {
           if (chrome.runtime.lastError) {
             reject(chrome.runtime.lastError);
           } else {
