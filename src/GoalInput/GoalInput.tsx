@@ -1,12 +1,43 @@
 import React, { ReactElement, useState } from 'react';
 
-const GoalInput: React.FC = () => {
+interface Props {
+  setShowPencil:  React.Dispatch<React.SetStateAction<boolean>>;
+  setShowPomodoro: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro }) => {
   const [screen, setScreen] = useState(0);
-  const [goal, setGoal] = useState('Your goal here');
+  let progress = (screen + 180).toString()+ "px";
+  const [goal, setGoal] = useState('');
+  const [subCount, setSubCount] = useState(1);
+  const [subtask, setSubtask] = useState('')
+  const [subtasksList, setSubtasksList] = useState<string[]>([])
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setGoal(e.target.value);
   }
+
+  const handleSubChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSubtask(e.target.value);
+  }
+
+  const addSubtask = (s:string) => {
+    setSubtasksList((prevList) => [...prevList, s]);
+    setSubtask('');
+    setSubCount((prev) => prev + 1);
+  }
+
+  const handleTaskChange = (e: React.ChangeEvent<HTMLInputElement>, idx: number) => {
+    const newTasks = [...subtasksList];
+    newTasks[idx] = e.target.value;
+    setSubtasksList(newTasks);
+  };
+
+  const removeSubtask = (idx: number) => {
+    const newTasks = subtasksList.filter((task, index) => index !== idx);
+    setSubtasksList(newTasks);
+    setSubCount((prev) => prev - 1)
+  };
 
   const submitGoal = () => {
     console.log({goal})
@@ -17,7 +48,7 @@ const GoalInput: React.FC = () => {
     bottom: '150px',
     padding: '20px',
     right: '40px',
-    zIndex: 1000,
+    zIndex: 999,
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
@@ -28,14 +59,17 @@ const GoalInput: React.FC = () => {
     width: '400px'
   } as React.CSSProperties;
 
-  const smartContainerStyle = {
+  const stepStyle = {
     display: 'flex',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
+    alignItems: 'center',
     fontFamily: 'Inter',
     fontSize: '16px',
     fontWeight: '600',
     padding: '5px',
-    lineHeight: '150%'
+    lineHeight: '150%',
+    margin: 0,
+
   } as React.CSSProperties;
 
   const pStyle = {
@@ -68,12 +102,23 @@ const GoalInput: React.FC = () => {
     boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)'
   } as React.CSSProperties;
 
+  const addBtnStyle = {
+    height: '30px',
+    width: '40px',
+    background: 'transparent',
+    cursor: 'pointer',
+    borderLeft: 'none'
+  } as React.CSSProperties;
+
   const progressbarStyle ={
-    height: '10px',
-    width: '100%',
-    borderRadius: '2px',
-    background: 'gray',
-    alignSelf: 'end'
+    height: '6px',
+    width: `${progress}`,
+    borderRadius: '10px',
+    background: 'blue',
+    position: 'absolute',
+    bottom: '170px',
+    right: '47px',
+    zIndex: 1000,
   } as React.CSSProperties;
 
   return (
@@ -89,7 +134,7 @@ const GoalInput: React.FC = () => {
           <>
           <p style={{...pStyle}}>Let's break it down backwards.</p>
           <p style={{...pStyle}}>What would you like to accomplish?</p>
-          <textarea style={{...textareaStyle}} value={goal} onChange={handleChange}/>
+          <textarea style={{...textareaStyle}} value={goal} onChange={handleChange} placeholder="Your goal here"/>
           <button style={{...editBtnStyle}} onClick={() => {setScreen(2)}}>Continue</button>
           </>
         )}
@@ -97,16 +142,34 @@ const GoalInput: React.FC = () => {
           <>
           <p style={{...pStyle}}>List the steps you think you'll need.</p>
           <p style={{...pStyle}}>(Make sure these are objectives)</p>
-          <ol>
-            <input style={{...textareaStyle}}/>
-            <button>+</button>
+          <ol style={{padding: 0}}>
+            {subtasksList && subtasksList.map((task, idx) => (
+              <li key={idx} style={{...stepStyle}}>
+                <input 
+                  style={{...textareaStyle, height: '30px'}}
+                  value={task}
+                  onChange={(e) => handleTaskChange(e, idx)}></input>
+                <button style={{...addBtnStyle}} onClick={() => removeSubtask(idx)}>-</button>
+              </li>
+            ))}
+            <li style={{...stepStyle}}>
+              <input style={{...textareaStyle, height: '30px'}} placeholder={`Step ${subCount}:`} value={subtask} onChange={handleSubChange}/>
+              <button style={{...addBtnStyle}} onClick={() => addSubtask(subtask)}>+</button>
+            </li>
           </ol>
-          <button style={{...editBtnStyle}}>Continue</button>
+          <button style={{...editBtnStyle}} onClick={() => setScreen(3)}>Continue</button>
+          </>
+        )}
+        {screen === 3 && (
+          <>
+          <p style={{...pStyle}}>Great! Let's get started!</p>
+          <button style={{...editBtnStyle}} onClick={()=> {setShowPencil(prev => !prev); setShowPomodoro(prev => !prev)}}>Go to timer</button>
           </>
         )}
 
-        <span style={{...progressbarStyle}}></span>
       </div>
+        <span style={{...progressbarStyle, zIndex: 999, backgroundColor: 'lightgray', width: '380px'}}></span>
+        <span style={{...progressbarStyle}}></span>
     </>
   );
 };
