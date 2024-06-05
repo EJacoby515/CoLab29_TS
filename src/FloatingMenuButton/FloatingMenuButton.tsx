@@ -4,18 +4,39 @@ import { faX, faCube, faPencilAlt, faCalendarAlt, faHourglassHalf } from '@forta
 import GoalInput from '../GoalInput/GoalInput';
 import PomodoroTimer from '../PomodoroTimer/PomodoroTimer';
 import Assessment from '../Assessment/Assessment';
+import Calendar from '../Calendar/Calendar';
 
 const FloatingMenuButton: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [pencilOpen, setPencilOpen] = useState(false);
+  const [showPencil, setShowPencil] = useState(false);
+  const [showCalendar, setShowCalendar] = useState(false);
   const [showPomodoro, setShowPomodoro] = useState(false);
   const [IsTimerStarted, setIsTimerStarted] = useState(false);
   const [showAssessment, setShowAssessment] = useState(false);
+  const [userStatus, setUserStatus] = useState('onboarding')
 
   const handleClick = async () => {
+    try {
+      const response: {} = await new Promise((resolve, reject) => {
+        chrome.runtime.sendMessage({ action: "getStorage"}, (response) => {
+          if (chrome.runtime.lastError) {
+            reject(chrome.runtime.lastError);
+          } else {
+            resolve(response);
+          }
+        });
+      });
+      console.log(response);
+      // if (response.currentGoal !== null) {
+      //   setUserStatus('onboarding')
+      // }
+      } catch (error) {
+        console.error('Error:', error);
+      }; 
     setMenuOpen(!menuOpen);
-    setPencilOpen(false);
+    setShowPencil(false);
     setShowPomodoro(false);
+    setShowCalendar(false);
   };
 
   const handleTimerStart = () => {
@@ -42,10 +63,11 @@ const FloatingMenuButton: React.FC = () => {
   }
 
   const handlePencilClick = () => {
-    setPencilOpen(!pencilOpen);
+    setShowPencil(!showPencil);
     };
 
   const handleCalendarClick = async () => {
+    setShowCalendar(!showCalendar);
     try {
       const response = await new Promise((resolve, reject) => {
         chrome.runtime.sendMessage({ action: "getStorage" }, (response) => {
@@ -105,9 +127,14 @@ const FloatingMenuButton: React.FC = () => {
       </button>
       {menuOpen && (
         <>
+<<<<<<< HEAD
           {pencilOpen && (
               <><GoalInput/>
               </>)}
+=======
+          {showPencil && (
+              <GoalInput/>)}
+>>>>>>> 1d73a437edda84ebea7c1a76dd2107a0cd41be2a
           <button
             style={{
               ...iconButtonStyle,
@@ -151,7 +178,12 @@ const FloatingMenuButton: React.FC = () => {
           <PomodoroTimer onTimerStart={handleTimerStart} onTimerFinish={handleTimerFinish} onTimerStop={handleTimerStop} />
         </div>
       )}
+<<<<<<< HEAD
       {showAssessment && <Assessment onAssessmentSubmit={handleAssessmentSubmit}/>}
+=======
+      {showAssessment && <Assessment/>}
+      {showCalendar && <Calendar/>}
+>>>>>>> 1d73a437edda84ebea7c1a76dd2107a0cd41be2a
     </>
   );
 };

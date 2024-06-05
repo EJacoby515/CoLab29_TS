@@ -10,17 +10,18 @@ import { faFaceSmileBeam as faFaceSmileBeamLine,
 const Assessment: React.FC<{ onAssessmentSubmit: () => void }> = ({onAssessmentSubmit}) => {
   const [journal, setJournal] = useState('');
   const [emoji, setEmoji] = useState('');
+  const [submitHovered, setsubmitHovered] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setJournal(e.target.value);
   }
 
-  const submitAssessment = async (face:string) => {
+  const submitAssessment = async (anemoji:string) => {
     console.log({journal});
     const formattedDate = new Date().toISOString();
     try {
       const response = await new Promise((resolve, reject) => {
-        chrome.runtime.sendMessage({ action: "appendStorage", key: formattedDate, value: face}, (response) => {
+        chrome.runtime.sendMessage({ action: "appendStorage", key: formattedDate, value: anemoji}, (response) => {
           if (chrome.runtime.lastError) {
             reject(chrome.runtime.lastError);
           } else {
@@ -46,7 +47,8 @@ const Assessment: React.FC<{ onAssessmentSubmit: () => void }> = ({onAssessmentS
     flexDirection: 'column',
     width: '400px',
     backgroundColor: 'white',
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)'
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)',
+    alignItems: 'center'
   } as React.CSSProperties;
 
   const emojiContainerStyle = {
@@ -68,23 +70,31 @@ const Assessment: React.FC<{ onAssessmentSubmit: () => void }> = ({onAssessmentS
   const textareaStyle ={
     font: 'Inter',
     height: '80px',
+    width: '100%',
     padding: '5px',
-    borderRadius: '2px'
+    borderRadius: '2px',
+    placeholder: 'Enter a short description on whether you achieved your goals'
   } as React.CSSProperties;
 
+<<<<<<< HEAD
   const editBtnStyle = {
     color: 'white',
     backgroundColor: '#3a2723',
     borderRadius: '4px',
+=======
+  const submitAssessStyle = {
+    color: 'black',
+    font: 'Inter',
+>>>>>>> 1d73a437edda84ebea7c1a76dd2107a0cd41be2a
     padding: '0px 12px',
     height: '32px',
     width: '100px',
     marginTop: '10px',
-    justifySelf: 'right',
+    textAlign: 'center',
     border: 'none',
     outline: 'none',
     cursor: 'pointer',
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)'
+    textDecoration: submitHovered ? 'underline' : 'none'
   } as React.CSSProperties;
 
   const emojiStyle = {
@@ -114,9 +124,13 @@ const Assessment: React.FC<{ onAssessmentSubmit: () => void }> = ({onAssessmentS
           <a style={{...emojiStyle, color: 'red'}} onClick={()=>{setEmoji('frown')}}>
             <FontAwesomeIcon icon={emoji === 'frown' ? faFaceFrownSolid : faFaceFrownOpenLine} /></a>
         </div>
-        <p style={{...pStyle}}>Study Session reflections:</p>
+        <p style={{...pStyle}}>What went well and what could be better?</p>
         <textarea style={{...textareaStyle}} value={journal} onChange={handleChange}/>
+<<<<<<< HEAD
         <button style={{...editBtnStyle, fontSize: '10px'}} onClick={() => {submitAssessment(emoji)}}>Log Session</button>
+=======
+        <button style={{...submitAssessStyle}} onMouseEnter={()=> {setsubmitHovered(true)}} onMouseLeave={() => {setsubmitHovered(false)}}onClick={() => {submitAssessment(emoji)}}>Submit</button>
+>>>>>>> 1d73a437edda84ebea7c1a76dd2107a0cd41be2a
       </div>
     </>
   );
