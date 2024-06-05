@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlay, faX, faRotateLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
+import { faPlay, faX, faRotateLeft, faStickyNote } from '@fortawesome/free-solid-svg-icons';
 import React, { useState, useEffect, useRef } from 'react';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
@@ -126,12 +126,16 @@ const PomodoroTimer: React.FC<{ onTimerStart: () => void; onTimerFinish: () => v
   return (
     <div style={{ textAlign: 'center', padding: '10px', borderRadius: '8px', backgroundColor: '#a8a8a8', position: 'relative' }}>
       <h2>deepFocus Timer</h2>
-      <div style={{ position: 'absolute', top: '0', right: '0' }}>
-        <button onClick={toggleNotes} style={{ backgroundColor: 'transparent', border: 'none', cursor: 'pointer' }}>
-          <FontAwesomeIcon icon={faArrowRight} />
-        </button>
+      <div style={{ position: 'absolute', top: '0', right: '0', height: '100%', width: showNotes ?'300px' :'40px', backgroundColor: '#3A2723', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'width 0.3s ease out', }}
+      onClick  = { toggleNotes }
+      >
+        <FontAwesomeIcon icon = { faStickyNote } style = {{ color: 'white',  fontSize: '20px' }}/>
       </div>
-      {showNotes && <QuickNotes onClose={toggleNotes} />}
+      {showNotes && (
+        <div style={{ position: 'absolute', top: '0', right: '40px', width: '260px', backgroundColor: 'white', padding: '10px', zIndex: 1 }}>
+          <QuickNotes onClose = { toggleNotes } />
+        </div>
+      )}
       <div style={{ position: 'relative', width: '200px', margin: '0 auto' }}>
         {isCustomTime ? (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
