@@ -76,16 +76,15 @@ const Assessment: React.FC<{ onAssessmentSubmit: () => void }> = ({onAssessmentS
     placeholder: 'Enter a short description on whether you achieved your goals'
   } as React.CSSProperties;
 
-<<<<<<< HEAD
   const editBtnStyle = {
     color: 'white',
     backgroundColor: '#3a2723',
-    borderRadius: '4px',
-=======
+    borderRadius: '4px'
+  }
+
   const submitAssessStyle = {
     color: 'black',
     font: 'Inter',
->>>>>>> 1d73a437edda84ebea7c1a76dd2107a0cd41be2a
     padding: '0px 12px',
     height: '32px',
     width: '100px',
@@ -126,11 +125,7 @@ const Assessment: React.FC<{ onAssessmentSubmit: () => void }> = ({onAssessmentS
         </div>
         <p style={{...pStyle}}>What went well and what could be better?</p>
         <textarea style={{...textareaStyle}} value={journal} onChange={handleChange}/>
-<<<<<<< HEAD
-        <button style={{...editBtnStyle, fontSize: '10px'}} onClick={() => {submitAssessment(emoji)}}>Log Session</button>
-=======
-        <button style={{...submitAssessStyle}} onMouseEnter={()=> {setsubmitHovered(true)}} onMouseLeave={() => {setsubmitHovered(false)}}onClick={() => {submitAssessment(emoji)}}>Submit</button>
->>>>>>> 1d73a437edda84ebea7c1a76dd2107a0cd41be2a
+        <button style={{...editBtnStyle, fontSize: '10px'}} onMouseEnter={()=> {setsubmitHovered(true)}} onMouseLeave={() => {setsubmitHovered(false)}} onClick={() => {submitAssessment(emoji)}}>Log Session</button>
       </div>
     </>
   );
