@@ -127,14 +127,8 @@ const FloatingMenuButton: React.FC = () => {
       </button>
       {menuOpen && (
         <>
-<<<<<<< HEAD
-          {pencilOpen && (
-              <><GoalInput/>
-              </>)}
-=======
           {showPencil && (
               <GoalInput/>)}
->>>>>>> 1d73a437edda84ebea7c1a76dd2107a0cd41be2a
           <button
             style={{
               ...iconButtonStyle,
@@ -178,12 +172,8 @@ const FloatingMenuButton: React.FC = () => {
           <PomodoroTimer onTimerStart={handleTimerStart} onTimerFinish={handleTimerFinish} onTimerStop={handleTimerStop} />
         </div>
       )}
-<<<<<<< HEAD
       {showAssessment && <Assessment onAssessmentSubmit={handleAssessmentSubmit}/>}
-=======
-      {showAssessment && <Assessment/>}
       {showCalendar && <Calendar/>}
->>>>>>> 1d73a437edda84ebea7c1a76dd2107a0cd41be2a
     </>
   );
 };
