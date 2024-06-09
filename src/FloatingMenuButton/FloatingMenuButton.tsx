@@ -128,7 +128,7 @@ const FloatingMenuButton: React.FC = () => {
       {menuOpen && (
         <>
           {showPencil && (
-              <GoalInput/>)}
+              <GoalInput setShowPencil={setShowPencil} setShowPomodoro={setShowPomodoro}/>)}
           <button
             style={{
               ...iconButtonStyle,
