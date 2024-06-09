@@ -14,10 +14,19 @@ const QuickNotes: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   };
 
   return (
-    <div style={{ position: 'absolute', top: '100%', left: '0', backgroundColor: 'white', padding: '10px', boxShadow: '0 2px 5px rgba(0, 0, 0, 0.3)' }}>
-      <textarea value={notes} onChange={handleNoteChange} placeholder="Add study notes here" rows={4} cols={30} />
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px' }}>
-        <button onClick={saveNotes}>Save</button>
+    <div style={{ backgroundColor: '#f0f0f0', padding: '10px', borderRadius: '4px', marginTop: '20px' }}>
+      <h4>Add study notes here:</h4>
+      <textarea
+        value={notes}
+        onChange={handleNoteChange}
+        placeholder="Type your notes..."
+        rows={4}
+        style={{ width: '100%', resize: 'vertical', marginBottom: '10px' }}
+      />
+      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <button onClick={saveNotes} style={{ marginRight: '10px' }}>
+          Save
+        </button>
         <button onClick={onClose}>Close</button>
       </div>
     </div>

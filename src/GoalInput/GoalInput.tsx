@@ -3,18 +3,20 @@ import React, { ReactElement, useState } from 'react';
 interface Props {
   setShowPencil:  React.Dispatch<React.SetStateAction<boolean>>;
   setShowPomodoro: React.Dispatch<React.SetStateAction<boolean>>;
+  setGoal: React.Dispatch<React.SetStateAction<string>>;
+  setSubtasksList: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro }) => {
+const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro, setGoal, setSubtasksList }) => {
   const [screen, setScreen] = useState(0);
   let progress = (screen + 180).toString()+ "px";
-  const [goal, setGoal] = useState('');
+  const [goal, setLocalGoal] = useState('');
   const [subCount, setSubCount] = useState(1);
   const [subtask, setSubtask] = useState('')
-  const [subtasksList, setSubtasksList] = useState<string[]>([])
+  const [subtasksList, setLocalSubtasksList] = useState<string[]>([])
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setGoal(e.target.value);
+    setLocalGoal(e.target.value);
   }
 
   const handleSubChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -22,7 +24,7 @@ const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro }) => {
   }
 
   const addSubtask = (s:string) => {
-    setSubtasksList((prevList) => [...prevList, s]);
+    setLocalSubtasksList((prevList) => [...prevList, s]);
     setSubtask('');
     setSubCount((prev) => prev + 1);
   }
@@ -30,17 +32,20 @@ const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro }) => {
   const handleTaskChange = (e: React.ChangeEvent<HTMLInputElement>, idx: number) => {
     const newTasks = [...subtasksList];
     newTasks[idx] = e.target.value;
-    setSubtasksList(newTasks);
+    setLocalSubtasksList(newTasks);
   };
 
   const removeSubtask = (idx: number) => {
     const newTasks = subtasksList.filter((task, index) => index !== idx);
-    setSubtasksList(newTasks);
+    setLocalSubtasksList(newTasks);
     setSubCount((prev) => prev - 1)
   };
 
   const submitGoal = () => {
-    console.log({goal})
+    setGoal(goal);
+    setSubtasksList(subtasksList);
+    setShowPencil(false);
+    setShowPomodoro(true);
   } 
 
   const goalcontainerStyle = {
@@ -163,7 +168,7 @@ const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro }) => {
         {screen === 3 && (
           <>
           <p style={{...pStyle}}>Great! Let's get started!</p>
-          <button style={{...editBtnStyle}} onClick={()=> {setShowPencil(prev => !prev); setShowPomodoro(prev => !prev)}}>Go to timer</button>
+          <button style={{...editBtnStyle}} onClick={submitGoal}>Go to timer</button>
           </>
         )}
 

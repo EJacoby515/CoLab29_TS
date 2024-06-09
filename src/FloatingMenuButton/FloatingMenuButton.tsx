@@ -13,6 +13,8 @@ const FloatingMenuButton: React.FC = () => {
   const [showPomodoro, setShowPomodoro] = useState(false);
   const [IsTimerStarted, setIsTimerStarted] = useState(false);
   const [showAssessment, setShowAssessment] = useState(false);
+  const [goal, setGoal] = useState('');
+  const [subtaskList, setSubtasksList] = useState<string[]>([]);
   const [userStatus, setUserStatus] = useState('onboarding')
 
   const handleClick = async () => {
@@ -128,7 +130,7 @@ const FloatingMenuButton: React.FC = () => {
       {menuOpen && (
         <>
           {showPencil && (
-              <GoalInput setShowPencil={setShowPencil} setShowPomodoro={setShowPomodoro}/>)}
+              <GoalInput setShowPencil={setShowPencil} setShowPomodoro={setShowPomodoro} setGoal={setGoal} setSubtasksList={setSubtasksList}/>)}
           <button
             style={{
               ...iconButtonStyle,
@@ -169,7 +171,7 @@ const FloatingMenuButton: React.FC = () => {
           transform: IsTimerStarted ? 'scale(0.8)' : 'scale(1)',
           transition: 'all 0.8s ease-in-out',
           }}>
-          <PomodoroTimer onTimerStart={handleTimerStart} onTimerFinish={handleTimerFinish} onTimerStop={handleTimerStop} />
+          <PomodoroTimer onTimerStart={handleTimerStart} onTimerFinish={handleTimerFinish} onTimerStop={handleTimerStop} goal={goal}  subtaskList={subtaskList}/>
         </div>
       )}
       {showAssessment && <Assessment onAssessmentSubmit={handleAssessmentSubmit}/>}
