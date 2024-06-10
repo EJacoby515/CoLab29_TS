@@ -10,30 +10,31 @@ chrome.runtime.onMessage.addListener(
     if (request.greeting === "hello")
       sendResponse({farewell: "goodbye"});
 
-    if (request.action === "getStorage") {
+    if (request.action === "startup") {
       try {
-        chrome.storage.sync.get(["focusData"]).then((result) => {sendResponse(result.focusData)})
-      } catch {
-        chrome.storage.sync.set({ "focusData" : { currentGoal: { "subtasks" : [] } } }).then((result) => {sendResponse(result.focusData)})
+        chrome.storage.sync.get(["focusData"]).then((result) => {
+          if (result.focusData === null) {
+            chrome.storage.sync.set({ "focusData" : { currentGoal: { "subtasks" : [] } } }).then((result) => {sendResponse("returning")})
+          } else {
+            sendResponse("onboarding")
+          }
+        }) 
+        } catch (error) {
+        sendResponse(error);
       }      
     return true;
     }
 
-    if (request.action === "appendStorage") {
-      const { key, value } = request;
-      chrome.storage.sync.get(["focusData"]).then((result)=>{
+    if (request.action === "fetchGoals") {
+      chrome.storage.sync.get(["focusData"]).then((result) => {
         const existingData = result.focusData || {};
-        existingData[key] = value;
-        chrome.storage.sync.set({ focusData: existingData }).then(() => {
-          sendResponse(existingData)
-        })
-        ;})
-    // Return true to indicate you want to send a response asynchronously
-      return true;
-      }
+        sendResponse(existingData.currentGoal)
+      })
+    return true;
+    }
+
     if (request.action === "appendCurrentGoal") {
       const { data } = request;
-
       chrome.storage.sync.get(["focusData"]).then((result)=>{
         const existingData = result.focusData || {};
         existingData["currentGoal"] = {"name": data};

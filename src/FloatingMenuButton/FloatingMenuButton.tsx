@@ -15,12 +15,12 @@ const FloatingMenuButton: React.FC = () => {
   const [showAssessment, setShowAssessment] = useState(false);
   const [goal, setGoal] = useState('');
   const [subtaskList, setSubtasksList] = useState<string[]>([]);
-  const [userStatus, setUserStatus] = useState('onboarding')
+  const [userStatus, setUserStatus] = useState<'returning'|'onboarding'|''>('');
 
   const handleClick = async () => {
     try {
       const response: {} = await new Promise((resolve, reject) => {
-        chrome.runtime.sendMessage({ action: "getStorage"}, (response) => {
+        chrome.runtime.sendMessage({ action: "startup"}, (response) => {
           if (chrome.runtime.lastError) {
             reject(chrome.runtime.lastError);
           } else {
@@ -29,9 +29,11 @@ const FloatingMenuButton: React.FC = () => {
         });
       });
       console.log(response);
-      // if (response.currentGoal !== null) {
-      //   setUserStatus('onboarding')
-      // }
+      if (response === 'returning') {
+        setUserStatus('returning');
+      } else if (response === 'onboarding'){
+        setUserStatus('onboarding');
+      }
       } catch (error) {
         console.log('Error:', error);
       }; 
@@ -128,7 +130,7 @@ const FloatingMenuButton: React.FC = () => {
       {menuOpen && (
         <>
           {showPencil && (
-              <GoalInput setShowPencil={setShowPencil} setShowPomodoro={setShowPomodoro} setGoal={setGoal} setSubtasksList={setSubtasksList}/>)}
+              <GoalInput setShowPencil={setShowPencil} setShowPomodoro={setShowPomodoro} setGoal={setGoal} setSubtasksList={setSubtasksList} userStatus={userStatus}/>)}
           <button
             style={{
               ...iconButtonStyle,

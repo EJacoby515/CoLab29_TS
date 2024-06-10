@@ -8,17 +8,31 @@ interface Props {
   setShowPomodoro: React.Dispatch<React.SetStateAction<boolean>>;
   setGoal: React.Dispatch<React.SetStateAction<string>>;
   setSubtasksList: React.Dispatch<React.SetStateAction<string[]>>;
+  userStatus: "returning" | "onboarding" | "";
 }
 
-const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro, setGoal, setSubtasksList }) => {
+interface GoalResponse {
+  name: string,
+  subtasks: [{ name: string
+              completed: boolean
+              studynotes: string
+              emoji: null | string
+              reflection: string
+              timestart: string
+              timeend: string
+  }]
+}
+
+const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro, setGoal, setSubtasksList, userStatus }) => {
   const [screen, setScreen] = useState(0);
   const [goal, setLocalGoal] = useState('');
   const [subCount, setSubCount] = useState(1);
-  const [subtask, setSubtask] = useState('')
-  const [subtasksList, setLocalSubtasksList] = useState<string[]>([])
+  const [subtask, setSubtask] = useState('');
+  const [subtasksList, setLocalSubtasksList] = useState<string[]>([]);
+  const [completedSubtasks, setCompletedSubtasks] = useState<string[]>([]);
   const [isButtonDisabled, setButtonDisabled] = useState(false);
   const [isSubButtonDisabled, setSubButtonDisabled] = useState(false);
-  const [subtaskSelected, selectSubtask] = useState<number>(10)
+  const [subtaskSelected, selectSubtask] = useState<number>(10);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLocalGoal(e.target.value);
@@ -87,6 +101,35 @@ const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro, setGoal, s
         console.error('Error:', error);
       };
     setScreen(prev => (prev + 1))
+  }
+
+  const fetchGoals = async () => {
+    try {
+      const response: GoalResponse = await new Promise((resolve, reject) => {
+        chrome.runtime.sendMessage({ action: "fetchGoals"}, (response) => {
+          if (chrome.runtime.lastError) {
+            reject(chrome.runtime.lastError);
+          } else {
+            resolve(response);
+          }
+        });
+      });
+      
+      setLocalGoal(response.name);
+      let subtasks = []
+      let completed = []
+      for (let i = 0; i < response.subtasks.length; i++) {
+        if (response.subtasks[i].completed === true){
+          completed.push(response.subtasks[i].name)
+        } else{
+          subtasks.push(response.subtasks[i].name)
+        }
+      }
+      setLocalSubtasksList(subtasks);
+      setCompletedSubtasks(completed);
+      } catch (error) {
+        console.log('Error:', error);
+      };
   }
 
   const goalcontainerStyle = {
@@ -225,6 +268,13 @@ const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro, setGoal, s
     }
   }, [subtasksList])
 
+  useEffect(() => {
+    if (userStatus === "returning") {
+      setScreen(3);
+      fetchGoals();
+    }
+  }, [])
+
   return (
     <>
       <div style={{...goalcontainerStyle}}>
@@ -317,7 +367,10 @@ const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro, setGoal, s
         {screen === 3 && (
           <>
           <p style={{...pStyle}}>Select a task to begin with!</p>
-          <button style={{...continueBtnStyle}} onClick={handleStartTimer}>Go to Timer</button>
+          <div>
+            <button style={{...continueBtnStyle}} onClick={handleStartTimer}>Go to Timer</button>
+            <button>Clear</button>
+          </div>
           </>
         )}
 
