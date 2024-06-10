@@ -15,12 +15,12 @@ const FloatingMenuButton: React.FC = () => {
   const [showAssessment, setShowAssessment] = useState(false);
   const [goal, setGoal] = useState('');
   const [subtaskList, setSubtasksList] = useState<string[]>([]);
-  const [userStatus, setUserStatus] = useState('onboarding')
+  const [userStatus, setUserStatus] = useState<'returning'|'onboarding'|''>('');
 
   const handleClick = async () => {
     try {
       const response: {} = await new Promise((resolve, reject) => {
-        chrome.runtime.sendMessage({ action: "getStorage"}, (response) => {
+        chrome.runtime.sendMessage({ action: "startup"}, (response) => {
           if (chrome.runtime.lastError) {
             reject(chrome.runtime.lastError);
           } else {
@@ -29,11 +29,13 @@ const FloatingMenuButton: React.FC = () => {
         });
       });
       console.log(response);
-      // if (response.currentGoal !== null) {
-      //   setUserStatus('onboarding')
-      // }
+      if (response === 'returning') {
+        setUserStatus('returning');
+      } else if (response === 'onboarding'){
+        setUserStatus('onboarding');
+      }
       } catch (error) {
-        console.error('Error:', error);
+        console.log('Error:', error);
       }; 
     setMenuOpen(!menuOpen);
     setShowPencil(false);
@@ -90,16 +92,15 @@ const FloatingMenuButton: React.FC = () => {
     position: 'fixed',
     bottom: '20px',
     right: '20px',
-    width: '60px',
-    height: '60px',
-    backgroundColor: '#3a2723',
+    width: '50px',
+    height: '50px',
+    backgroundColor: '#38608F',
     color: '#fff',
     border: 'none',
-    borderRadius: '50%',
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)',
+    borderRadius: '15px',
     cursor: 'pointer',
     zIndex: 1000,
-    fontSize: '24px',
+    fontSize: '20px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -109,11 +110,10 @@ const FloatingMenuButton: React.FC = () => {
     position: 'fixed',
     width: '50px',
     height: '50px',
-    backgroundColor: '#3a2723',
+    backgroundColor: '#38608F',
     color: '#fff',
     border: 'none',
-    borderRadius: '10px',
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)',
+    borderRadius: '15px',
     cursor: 'pointer',
     zIndex: 999,
     fontSize: '20px',
@@ -130,7 +130,7 @@ const FloatingMenuButton: React.FC = () => {
       {menuOpen && (
         <>
           {showPencil && (
-              <GoalInput setShowPencil={setShowPencil} setShowPomodoro={setShowPomodoro} setGoal={setGoal} setSubtasksList={setSubtasksList}/>)}
+              <GoalInput setShowPencil={setShowPencil} setShowPomodoro={setShowPomodoro} setGoal={setGoal} setSubtasksList={setSubtasksList} userStatus={userStatus}/>)}
           <button
             style={{
               ...iconButtonStyle,
