@@ -1,49 +1,48 @@
-import React, { ReactElement, useState } from 'react';
+import React, { useState } from 'react';
 
 interface Props {
   setShowPencil:  React.Dispatch<React.SetStateAction<boolean>>;
   setShowPomodoro: React.Dispatch<React.SetStateAction<boolean>>;
-  setGoal: React.Dispatch<React.SetStateAction<string>>;
-  setSubtasksList: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro, setGoal, setSubtasksList }) => {
+const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro }) => {
   const [screen, setScreen] = useState(0);
   let progress = (screen + 180).toString()+ "px";
-  const [goal, setLocalGoal] = useState('');
+  const [goal, setGoal] = useState('');
   const [subCount, setSubCount] = useState(1);
-  const [subtask, setSubtask] = useState('')
-  const [subtasksList, setLocalSubtasksList] = useState<string[]>([])
+  const [subtasks, setSubtasks] = useState('')
+  const [subtasksList, setSubtasksList] = useState<string[]>([])
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setLocalGoal(e.target.value);
+    setGoal(e.target.value);
   }
 
   const handleSubChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSubtask(e.target.value);
+    setSubtasks(e.target.value);
   }
 
   const addSubtask = (s:string) => {
-    setLocalSubtasksList((prevList) => [...prevList, s]);
-    setSubtask('');
+    setSubtasksList((prevList) => [...prevList, s]);
+    setSubtasks('');
     setSubCount((prev) => prev + 1);
   }
 
   const handleTaskChange = (e: React.ChangeEvent<HTMLInputElement>, idx: number) => {
     const newTasks = [...subtasksList];
     newTasks[idx] = e.target.value;
-    setLocalSubtasksList(newTasks);
+    setSubtasksList(newTasks);
   };
 
   const removeSubtask = (idx: number) => {
     const newTasks = subtasksList.filter((task, index) => index !== idx);
-    setLocalSubtasksList(newTasks);
+    setSubtasksList(newTasks);
     setSubCount((prev) => prev - 1)
   };
 
   const submitGoal = () => {
-    setGoal(goal);
-    setSubtasksList(subtasksList);
+    chrome.storage.sync.set({goal, subtasksList },  ()  => {
+      console.log('Goal and subtasks saved to storage');
+    });
     setShowPencil(false);
     setShowPomodoro(true);
   } 
@@ -148,18 +147,18 @@ const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro, setGoal, s
           <p style={{...pStyle}}>List the steps you think you'll need.</p>
           <p style={{...pStyle}}>(Make sure these are objectives)</p>
           <ol style={{padding: 0}}>
-            {subtasksList && subtasksList.map((task, idx) => (
+            {subtasksList && subtasksList.map((subtask, idx) => (
               <li key={idx} style={{...stepStyle}}>
                 <input 
                   style={{...textareaStyle, height: '30px'}}
-                  value={task}
+                  value={subtask}
                   onChange={(e) => handleTaskChange(e, idx)}></input>
                 <button style={{...addBtnStyle}} onClick={() => removeSubtask(idx)}>-</button>
               </li>
             ))}
             <li style={{...stepStyle}}>
-              <input style={{...textareaStyle, height: '30px'}} placeholder={`Step ${subCount}:`} value={subtask} onChange={handleSubChange}/>
-              <button style={{...addBtnStyle}} onClick={() => addSubtask(subtask)}>+</button>
+              <input style={{...textareaStyle, height: '30px'}} placeholder={`Step ${subCount}:`} value={subtasks} onChange={handleSubChange}/>
+              <button style={{...addBtnStyle}} onClick={() => addSubtask(subtasks)}>+</button>
             </li>
           </ol>
           <button style={{...editBtnStyle}} onClick={() => setScreen(3)}>Continue</button>

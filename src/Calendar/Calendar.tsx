@@ -1,37 +1,58 @@
 import React, { ReactElement, useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleCheck } from '@fortawesome/free-regular-svg-icons';
-import {faChevronLeft, faChevronRight, faPlus} from '@fortawesome/free-solid-svg-icons';
-
-
+import { faChevronLeft, faChevronRight, faPlus } from '@fortawesome/free-solid-svg-icons';
 
 const Calendar: React.FC = () => {
-
   const [today, setToday] = useState('');
   const [week, setWeek] = useState<string[]>([]);
+  const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
+  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 
   const getDates = () => {
     let date = new Date();
     setToday(date.toDateString());
-    getWeek(date.toDateString())
-  }
+    getWeek(new Date(currentYear, currentMonth, 1));
+  };
 
-  const getWeek = (date:string) => {
-    let start = new Date(date)
-    console.log(start)
+  const getWeek = (date: Date) => {
+    let start = new Date(date);
+    console.log(start);
     if (start.getDay() !== 0) {
-      start.setDate(start.getDate() - start.getDay())
+      start.setDate(start.getDate() - start.getDay());
     }
-    let mylst: string[] = []
-    for (let i=0 ; i < 7; i++) {
-      let added = start.toDateString().slice(4,10)
-      mylst.push(added)
-      start.setDate(start.getDate() + 1)
+    let mylst: string[] = [];
+    for (let i = 0; i < 7; i++) {
+      let added = start.toDateString().slice(4, 10);
+      mylst.push(added);
+      start.setDate(start.getDate() + 1);
     }
-    setWeek([...mylst])
-  }
+    setWeek([...mylst]);
+  };
 
-  useEffect(() => {getDates();}, [])
+  useEffect(() => {
+    getDates();
+  }, [currentMonth, currentYear]);
+
+  const goToPreviousWeek = () => {
+    const firstDayOfCurrentWeek = new Date(currentYear, currentMonth, parseInt(week[0].split(' ')[1]));
+    const previousWeek = new Date(firstDayOfCurrentWeek);
+    previousWeek.setDate(firstDayOfCurrentWeek.getDate() - 7);
+    setCurrentMonth(previousWeek.getMonth());
+    setCurrentYear(previousWeek.getFullYear());
+    getWeek(previousWeek);
+  };
+
+  const goToNextWeek = () => {
+    const firstDayOfCurrentWeek = new Date(currentYear, currentMonth, parseInt(week[0].split(' ')[1]));
+    const nextWeek = new Date(firstDayOfCurrentWeek);
+    nextWeek.setDate(firstDayOfCurrentWeek.getDate() + 7);
+    if (nextWeek <= new Date()) {
+      setCurrentMonth(nextWeek.getMonth());
+      setCurrentYear(nextWeek.getFullYear());
+      getWeek(nextWeek);
+    }
+  };
 
   const calendarcontainerStyle = {
     position: 'fixed',
@@ -63,7 +84,6 @@ const Calendar: React.FC = () => {
     margin: '5px 0'
   } as React.CSSProperties;
 
-
   const navigationStyle = {
     display: 'flex',
     justifyContent: 'space-between',
@@ -94,54 +114,71 @@ const Calendar: React.FC = () => {
 
   return (
     <>
-      <div style={{...calendarcontainerStyle}}>
-        <p style={{...pStyle, margin: '0'}}>Today: {today}</p>
-        <div style={{...weekContainerStyle}}>
-          <div style={{...weekdayContainerStyle}}>
+      <div style={{ ...calendarcontainerStyle }}>
+        <p style={{ ...pStyle, margin: '0' }}>Today: {today}</p>
+        <div style={{ ...weekContainerStyle }}>
+          <div style={{ ...weekdayContainerStyle }}>
             <p>Su</p>
-            <a style={{...dayIconStyle}}>
-              <FontAwesomeIcon icon={faPlus}/></a>
+            <a style={{ ...dayIconStyle }}>
+              <FontAwesomeIcon icon={faPlus} />
+            </a>
           </div>
-          <div style={{...weekdayContainerStyle}}>
+          <div style={{ ...weekdayContainerStyle }}>
             <p>Mo</p>
-            <a style={{...dayIconStyle}}>
-              <FontAwesomeIcon icon={faPlus}/></a>
+            <a style={{ ...dayIconStyle }}>
+              <FontAwesomeIcon icon={faPlus} />
+            </a>
           </div>
-          <div style={{...weekdayContainerStyle}}>
+          <div style={{ ...weekdayContainerStyle }}>
             <p>Tu</p>
-            <a style={{...dayIconStyle}}>
-              <FontAwesomeIcon icon={faPlus}/></a>
+            <a style={{ ...dayIconStyle }}>
+              <FontAwesomeIcon icon={faPlus} />
+            </a>
           </div>
-          <div style={{...weekdayContainerStyle}}>
+          <div style={{ ...weekdayContainerStyle }}>
             <p>We</p>
-            <a style={{...dayIconStyle}}>
-              <FontAwesomeIcon icon={faPlus}/></a>
+            <a style={{ ...dayIconStyle }}>
+              <FontAwesomeIcon icon={faPlus} />
+            </a>
           </div>
-          <div style={{...weekdayContainerStyle}}>
+          <div style={{ ...weekdayContainerStyle }}>
             <p>Th</p>
-            <a style={{...dayIconStyle}}>
-              <FontAwesomeIcon icon={faPlus}/></a>
+            <a style={{ ...dayIconStyle }}>
+              <FontAwesomeIcon icon={faPlus} />
+            </a>
           </div>
-          <div style={{...weekdayContainerStyle}}>
+          <div style={{ ...weekdayContainerStyle }}>
             <p>Fr</p>
-            <a style={{...dayIconStyle}}>
-              <FontAwesomeIcon icon={faPlus}/></a>
+            <a style={{ ...dayIconStyle }}>
+              <FontAwesomeIcon icon={faPlus} />
+            </a>
           </div>
-          <div style={{...weekdayContainerStyle}}>
+          <div style={{ ...weekdayContainerStyle }}>
             <p>Sa</p>
-            <a style={{...dayIconStyle}}>
-              <FontAwesomeIcon icon={faPlus}/></a>
+            <a style={{ ...dayIconStyle }}>
+              <FontAwesomeIcon icon={faPlus} />
+            </a>
           </div>
         </div>
-        <p style={{...pStyle, fontWeight: '600'}}>Session streaks</p>
-        <p style={{...pStyle}}>Keep up the good work!</p>
-        <div style={{...navigationStyle}}>
-          <a style={{...arrowStyle}}><FontAwesomeIcon icon={faChevronLeft}/></a>
-          <div style={{textAlign: 'center'}}>
-            <p style={{...pStyle, color: 'black'}}>{week[0]} - {week[6]}</p>
-            <p style={{...pStyle, fontWeight: '600', color: 'black'}}>This week</p>
+        <p style={{ ...pStyle, fontWeight: '600' }}>Session streaks</p>
+        <p style={{ ...pStyle }}>Keep up the good work!</p>
+        <div style={{ ...navigationStyle }}>
+          <a style={{ ...arrowStyle }} onClick={goToPreviousWeek}>
+            <FontAwesomeIcon icon={faChevronLeft} />
+          </a>
+          <div style={{ textAlign: 'center' }}>
+            <p style={{ ...pStyle, color: 'black' }}>
+              {week.length > 0 ? `${week[0]} - ${week[6]}` : ''}
+            </p>
+            <p style={{ ...pStyle, fontWeight: '600', color: 'black' }}>
+              {new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long' })} {currentYear}
+            </p>
           </div>
-          <a style={{...arrowStyle}}><FontAwesomeIcon icon={faChevronRight}/></a>
+          {week.length > 0 && new Date(currentYear, currentMonth, parseInt(week[0].split(' ')[1]) + 7) <= new Date() && (
+            <a style={{ ...arrowStyle }} onClick={goToNextWeek}>
+              <FontAwesomeIcon icon={faChevronRight} />
+            </a>
+          )}
         </div>
       </div>
     </>

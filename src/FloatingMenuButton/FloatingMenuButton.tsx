@@ -92,7 +92,7 @@ const FloatingMenuButton: React.FC = () => {
     right: '20px',
     width: '60px',
     height: '60px',
-    backgroundColor: '#3a2723',
+    backgroundColor: '#38608F',
     color: '#fff',
     border: 'none',
     borderRadius: '50%',
@@ -109,7 +109,7 @@ const FloatingMenuButton: React.FC = () => {
     position: 'fixed',
     width: '50px',
     height: '50px',
-    backgroundColor: '#3a2723',
+    backgroundColor: '#38608F',
     color: '#fff',
     border: 'none',
     borderRadius: '10px',
@@ -130,7 +130,7 @@ const FloatingMenuButton: React.FC = () => {
       {menuOpen && (
         <>
           {showPencil && (
-              <GoalInput setShowPencil={setShowPencil} setShowPomodoro={setShowPomodoro} setGoal={setGoal} setSubtasksList={setSubtasksList}/>)}
+              <GoalInput setShowPencil={setShowPencil} setShowPomodoro={setShowPomodoro} />)}
           <button
             style={{
               ...iconButtonStyle,
@@ -171,7 +171,7 @@ const FloatingMenuButton: React.FC = () => {
           transform: IsTimerStarted ? 'scale(0.8)' : 'scale(1)',
           transition: 'all 0.8s ease-in-out',
           }}>
-          <PomodoroTimer onTimerStart={handleTimerStart} onTimerFinish={handleTimerFinish} onTimerStop={handleTimerStop} goal={goal}  subtaskList={subtaskList}/>
+          <PomodoroTimer onTimerStart={handleTimerStart} onTimerFinish={handleTimerFinish} onTimerStop={handleTimerStop} />
         </div>
       )}
       {showAssessment && <Assessment onAssessmentSubmit={handleAssessmentSubmit}/>}

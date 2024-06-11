@@ -10,11 +10,9 @@ interface Props {
   onTimerStart: () => void;
   onTimerFinish: () => void;
   onTimerStop: () => void;
-  goal: string;
-  subtaskList: string[];
 }
 
-const PomodoroTimer: React.FC<Props> = ({ onTimerStart, onTimerFinish, onTimerStop, goal, subtaskList }) => {
+const PomodoroTimer: React.FC<Props> = ({ onTimerStart, onTimerFinish, onTimerStop }) => {
   const [time, setTime] = useState(1500);
   const [isRunning, setIsRunning] = useState(false);
   const [isCustomTime, setIsCustomTime] = useState(false);
@@ -22,6 +20,19 @@ const PomodoroTimer: React.FC<Props> = ({ onTimerStart, onTimerFinish, onTimerSt
   const [halfwayAlertTriggered, setHalfwayAlertTriggered] = useState(false);
   const [showNotes, setShowNotes] = useState(false);
   const timerRef = useRef<number | null>(null);
+  const [goal, setGoal] = useState ('');
+  const [subtasksList, setSubtasksList] = useState<string[]>([]);
+
+  useEffect (() => {
+    chrome.storage.sync.get(['goal','subtasksList'], (result) =>{
+      if (result.goal){
+        setGoal(result.goal);
+      }
+      if (result.subtasksList) {
+        setSubtasksList(result.subtasksList);
+      }
+    });
+  }, []);
 
   const toggleNotes = () => {
     setShowNotes(!showNotes);
@@ -106,7 +117,7 @@ const PomodoroTimer: React.FC<Props> = ({ onTimerStart, onTimerFinish, onTimerSt
     width: '40px',
     height: '40px',
     margin: '0 5px',
-    backgroundColor: '#3A2723',
+    backgroundColor: '#38608F',
     color: 'white',
     border: 'none',
     cursor: 'pointer',
@@ -115,7 +126,7 @@ const PomodoroTimer: React.FC<Props> = ({ onTimerStart, onTimerFinish, onTimerSt
   const customTimeInputStyle: React.CSSProperties = {
     padding: '8px',
     borderRadius: '4px',
-    border: '1px solid #3A2723',
+    border: '1px solid #38608F',
     marginRight: '8px',
     width: '80px',
     textAlign: 'center',
@@ -125,7 +136,7 @@ const PomodoroTimer: React.FC<Props> = ({ onTimerStart, onTimerFinish, onTimerSt
   const customTimeButtonStyle: React.CSSProperties = {
     padding: '8px 16px',
     borderRadius: '4px',
-    backgroundColor: '#3A2723',
+    backgroundColor: '#38608F',
     color: 'white',
     border: 'none',
     cursor: 'pointer',
@@ -169,7 +180,7 @@ const PomodoroTimer: React.FC<Props> = ({ onTimerStart, onTimerFinish, onTimerSt
                 styles={buildStyles({
                   textColor: '#3A2723',
                   pathColor: '#3A2723',
-                  trailColor: '#f6f1f0',
+                  trailColor: '#38608F',
                 })}
               />
             </div>
@@ -221,7 +232,7 @@ const PomodoroTimer: React.FC<Props> = ({ onTimerStart, onTimerFinish, onTimerSt
         style={{
           position: 'relative',
           width: showNotes ? '300px' : '40px',
-          backgroundColor: '#3A2723',
+          backgroundColor: '#38608F',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -237,8 +248,8 @@ const PomodoroTimer: React.FC<Props> = ({ onTimerStart, onTimerFinish, onTimerSt
           <h3> Goal: {goal}</h3>
           <h4>Tasks:</h4>
           <ul>
-            {subtaskList.map((task,index) => (
-              <li key = {index}>{task}</li>
+            {subtasksList.map((subtask,index) => (
+              <li key = {index}>{subtask}</li>
             ))}
           </ul>
           <QuickNotes onClose={toggleNotes} />
