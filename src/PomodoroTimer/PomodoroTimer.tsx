@@ -10,6 +10,8 @@ interface Props {
   onTimerStart: () => void;
   onTimerFinish: () => void;
   onTimerStop: () => void;
+  goal: string;
+  subtaskList: string[];
 }
 
 const PomodoroTimer: React.FC<Props> = ({ onTimerStart, onTimerFinish, onTimerStop }) => {
