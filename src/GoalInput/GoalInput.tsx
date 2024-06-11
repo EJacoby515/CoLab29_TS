@@ -1,4 +1,8 @@
 import React, { useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircleDot as SolidCircleDot } from '@fortawesome/free-solid-svg-icons';
+import { faCircleDot as OpenCircleDot } from '@fortawesome/free-regular-svg-icons';
+
 
 interface Props {
   setShowPencil:  React.Dispatch<React.SetStateAction<boolean>>;
@@ -171,6 +175,14 @@ const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro }) => {
           </>
         )}
 
+        {/* Progressbar */}
+        <div style={{...progressbarStyle}}>
+          <FontAwesomeIcon icon={screen < 1 ? OpenCircleDot : SolidCircleDot} />
+          <hr style={{background: '#079455', height: '4px', width: '48px'}}></hr>
+          <FontAwesomeIcon icon={screen < 2 ? OpenCircleDot : SolidCircleDot} />
+          <hr style={{background: '#079455', height: '4px', width: '48px'}}></hr>
+          <FontAwesomeIcon icon={screen < 3 ? OpenCircleDot : SolidCircleDot} />
+        </div>
       </div>
         <span style={{...progressbarStyle, zIndex: 999, backgroundColor: 'lightgray', width: '380px'}}></span>
         <span style={{...progressbarStyle}}></span>

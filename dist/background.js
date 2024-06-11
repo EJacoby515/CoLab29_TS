@@ -14,9 +14,9 @@ chrome.runtime.onMessage.addListener(
       try {
         chrome.storage.sync.get(["focusData"]).then((result) => {
           if (result.focusData === null) {
-            chrome.storage.sync.set({ "focusData" : { currentGoal: { "subtasks" : [] } } }).then((result) => {sendResponse("returning")})
+            chrome.storage.sync.set({ "focusData" : { currentGoal: { "subtasks" : [] } } }).then((result) => {sendResponse("onboarding")})
           } else {
-            sendResponse("onboarding")
+            sendResponse("returning")
           }
         }) 
         } catch (error) {

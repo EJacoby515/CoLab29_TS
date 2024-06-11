@@ -82,7 +82,7 @@ const FloatingMenuButton: React.FC = () => {
       });
       console.log(response);
       } catch (error) {
-        console.error('Error:', error);
+        console.log('Error:', error);
       };
   }
 
