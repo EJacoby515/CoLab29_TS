@@ -1,23 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faX, faCube, faPencilAlt, faCalendarAlt, faHourglassHalf } from '@fortawesome/free-solid-svg-icons';
+import { faX, faCube, faPen, faCalendarAlt, faHourglassHalf, faRotateLeft } from '@fortawesome/free-solid-svg-icons';
 import GoalInput from '../GoalInput/GoalInput';
 import PomodoroTimer from '../PomodoroTimer/PomodoroTimer';
 import Assessment from '../Assessment/Assessment';
 import Calendar from '../Calendar/Calendar';
+import Alert from '../Alert/Alert';
 
 const FloatingMenuButton: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showPencil, setShowPencil] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
   const [showPomodoro, setShowPomodoro] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
   const [IsTimerStarted, setIsTimerStarted] = useState(false);
   const [showAssessment, setShowAssessment] = useState(false);
   const [goal, setGoal] = useState('');
   const [subtaskList, setSubtasksList] = useState<string[]>([]);
   const [userStatus, setUserStatus] = useState<'returning'|'onboarding'|''>('');
 
-  const handleClick = async () => {
+  const getUserStatus = async () => {
     try {
       const response: {} = await new Promise((resolve, reject) => {
         chrome.runtime.sendMessage({ action: "startup"}, (response) => {
@@ -31,16 +33,31 @@ const FloatingMenuButton: React.FC = () => {
       console.log(response);
       if (response === 'returning') {
         setUserStatus('returning');
+        
       } else if (response === 'onboarding'){
         setUserStatus('onboarding');
       }
       } catch (error) {
         console.log('Error:', error);
       }; 
+  }
+
+  const handleClick = () => {
+    if (menuOpen === false) {
+      if (userStatus === 'onboarding') 
+        {setShowPencil(true);} 
+
+      else if 
+      (userStatus === 'returning') 
+        {setShowPomodoro(true);}
+    
+    } else {
+      setShowCalendar(false);
+      setShowPomodoro(false);
+      setShowPencil(false);
+      setShowAlert(false);
+      }
     setMenuOpen(!menuOpen);
-    setShowPencil(false);
-    setShowPomodoro(false);
-    setShowCalendar(false);
   };
 
   const handleTimerStart = () => {
@@ -67,7 +84,11 @@ const FloatingMenuButton: React.FC = () => {
   }
 
   const handlePencilClick = () => {
-    setShowPencil(!showPencil);
+    if (userStatus === 'returning') {
+      setShowAlert(true);
+    } else {
+      setShowPencil(!showPencil);
+    }
     };
 
   const handleCalendarClick = async () => {
@@ -84,7 +105,7 @@ const FloatingMenuButton: React.FC = () => {
       });
       console.log(response);
       } catch (error) {
-        console.error('Error:', error);
+        console.log('Error:', error);
       };
   }
 
@@ -122,6 +143,10 @@ const FloatingMenuButton: React.FC = () => {
     justifyContent: 'center',
   } as React.CSSProperties;
 
+  useEffect(() => {
+    getUserStatus();
+  }, [])
+
   return (
     <>
       <button style={buttonStyle} onClick={handleClick}>
@@ -129,18 +154,21 @@ const FloatingMenuButton: React.FC = () => {
       </button>
       {menuOpen && (
         <>
-          {showPencil && (
-              <GoalInput setShowPencil={setShowPencil} setShowPomodoro={setShowPomodoro} setGoal={setGoal} setSubtasksList={setSubtasksList} userStatus={userStatus}/>)}
+        {/* Pencil */}
           <button
-            style={{
-              ...iconButtonStyle,
-              bottom: '90px',
-              right: '20px',
-            }}
-            onClick={handlePencilClick}
-          >
-            <FontAwesomeIcon icon={faPencilAlt} />
+              style={{
+                ...iconButtonStyle,
+                bottom: '90px',
+                right: '20px',
+              }}
+              onClick={handlePencilClick}
+            >
+            {userStatus === 'returning' ? 
+              <FontAwesomeIcon icon={faRotateLeft} /> 
+              : <FontAwesomeIcon icon={faPen} />}
           </button>
+
+          {/* Calendar */}
           <button
             style={{
               ...iconButtonStyle,
@@ -151,6 +179,8 @@ const FloatingMenuButton: React.FC = () => {
           >
             <FontAwesomeIcon icon={faCalendarAlt} />
           </button>
+
+          {/* Pomodoro Timer */}
           <button
             style={{
               ...iconButtonStyle,
@@ -163,6 +193,9 @@ const FloatingMenuButton: React.FC = () => {
           </button>
         </>
       )}
+
+      {showPencil && (
+          <GoalInput setShowPencil={setShowPencil} setShowPomodoro={setShowPomodoro} setGoal={setGoal} setSubtasksList={setSubtasksList} userStatus={userStatus} setUserStatus={setUserStatus}/>)}
       {showPomodoro && (
         <div style={{ 
           position: 'fixed', 
@@ -176,6 +209,7 @@ const FloatingMenuButton: React.FC = () => {
       )}
       {showAssessment && <Assessment onAssessmentSubmit={handleAssessmentSubmit}/>}
       {showCalendar && <Calendar/>}
+      {showAlert && (<Alert setShowAlert={setShowAlert} setUserStatus={setUserStatus}/>)}
     </>
   );
 };

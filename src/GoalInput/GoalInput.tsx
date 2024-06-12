@@ -1,7 +1,7 @@
 import React, { ReactElement, useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrashCan, faCircleDot as OpenCircleDot, faStar } from '@fortawesome/free-regular-svg-icons';
-import { faPen, faPlus, faCircleDot as SolidCircleDot } from '@fortawesome/free-solid-svg-icons';
+import { faTrashCan, faCircleDot as OpenCircleDot } from '@fortawesome/free-regular-svg-icons';
+import { faPen, faPlus, faCircleDot as SolidCircleDot, faCircleCheck } from '@fortawesome/free-solid-svg-icons';
 
 interface Props {
   setShowPencil:  React.Dispatch<React.SetStateAction<boolean>>;
@@ -9,6 +9,7 @@ interface Props {
   setGoal: React.Dispatch<React.SetStateAction<string>>;
   setSubtasksList: React.Dispatch<React.SetStateAction<string[]>>;
   userStatus: "returning" | "onboarding" | "";
+  setUserStatus: React.Dispatch<React.SetStateAction<'returning'|'onboarding'|''>>;
 }
 
 interface GoalResponse {
@@ -23,7 +24,7 @@ interface GoalResponse {
   }]
 }
 
-const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro, setGoal, setSubtasksList, userStatus }) => {
+const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro, setGoal, setSubtasksList, userStatus, setUserStatus }) => {
   const [screen, setScreen] = useState(0);
   const [goal, setLocalGoal] = useState('');
   const [subCount, setSubCount] = useState(1);
@@ -34,7 +35,7 @@ const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro, setGoal, s
   const [isSubButtonDisabled, setSubButtonDisabled] = useState(false);
   const [subtaskSelected, selectSubtask] = useState<number>(10);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setLocalGoal(e.target.value);
   }
 
@@ -65,6 +66,7 @@ const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro, setGoal, s
   const handleStartTimer = () => {
     setShowPencil(false);
     setShowPomodoro(true);
+    setUserStatus("returning");
   }
 
   const handleGoalSubmit = async () => {
@@ -145,8 +147,8 @@ const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro, setGoal, s
     backgroundColor: '#F8F9FF',
     borderRadius: '12px',
     border: '1px solid #D0D5DD',
-    height: '500px',
-    width: '480px',
+    height: '480px',
+    width: '460px',
   } as React.CSSProperties;
 
   const stepStyle = {
@@ -164,16 +166,14 @@ const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro, setGoal, s
   const goalStyle = {
     fontFamily: 'Roboto',
     fontWeight: 500,
+    textDecoration: 'none',
+    textStyle: 'none',
     fontSize: '16px',
     lineHeight: '18px',
     padding: '12px',
     color: 'black',
     width: '400px',
     margin: '0 auto',
-    backgroundColor: 'rgba(56, 96, 143, 0.05)',
-    border: '1px solid #C3C6CF',
-    borderRadius: '12px',
-    alignSelf: 'center'
   }
 
   const subtaskStyle = {
@@ -198,9 +198,9 @@ const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro, setGoal, s
     color: '#22191A',
     fontFamily: 'Arial',
     fontWeight: 400,
-    fontSize: '16px',
-    lineHeight: '18px',
-    margin: '0 auto',
+    fontSize: '14px',
+    lineHeight: '16px',
+    margin: '10px auto',
     padding: 0
   } as React.CSSProperties;
 
@@ -209,10 +209,11 @@ const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro, setGoal, s
     fontFamily: 'Arial',
     display: 'block',
     lineHeight: '18px',
-    width: '340px',
+    width: '100%',
     padding: '5px',
     borderRadius: '2px',
-    overflowY: 'scroll'
+    overflowY: 'scroll',
+    margin: '10px 0'
   } as React.CSSProperties;
 
   const continueBtnStyle = {
@@ -282,11 +283,11 @@ const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro, setGoal, s
         {/* start screen */}
         {screen === 0 && (
           <>
-            <p style={{...pStyle}}>Let's set up your goal!</p>
+            <p style={{...pStyle, fontWeight: 800}}>Let's set up your goal!</p>
             <button 
               style={{...continueBtnStyle}} 
               onClick={() => {setScreen(1)}}>
-                Start
+                Let's do it
             </button>
           </>
         )}
@@ -294,12 +295,13 @@ const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro, setGoal, s
         {/* set goal and date if desired */}
         {screen === 1 && ( 
             <>
-              <p style={{...pStyle}}>Let's break it down backwards. <br />What is your long term learning goal?</p>
-              <input 
-                style={{...inputStyle, textAlign: 'center'}} 
+              <p style={{...pStyle, textAlign: 'left'}}>Let's break it down backwards. </p>
+              <p style={{...pStyle, color: '#22191A', fontSize: '14px'}}>What would you like to accomplish?<br/>A good goal is one that is clearly defined, achievable, and meaningful.</p>
+              <textarea 
+                style={{...inputStyle, height: '64px'}} 
                 value={goal} 
                 onChange={handleChange} 
-                placeholder="Your goal here, ex. I want to hold a 5 min conversation in French" 
+                placeholder='Example: If your long-term aim is to improve your health, a relevant goal would be "Eat 5 servings of fruits and vegetables daily."' 
                 maxLength={200}
                 onKeyDown={(e) => { if (e.key === "Enter") {handleGoalSubmit()}}}
                 />
@@ -310,7 +312,7 @@ const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro, setGoal, s
           {/* Set subtasks */}
           {screen > 1 && ( 
           <>
-            <p style={{...goalStyle, display: 'flex', justifyContent: 'center'}}><FontAwesomeIcon icon={faStar} />{goal}</p>
+            <p style={{...goalStyle}}>I will <span style={{fontWeight: 800, textDecoration: 'underline', fontStyle: 'italic'}}> {goal}</span>.</p>
 
             <ol style={{ height: '300px', overflow: 'scroll', paddingLeft: '0'}}>
               {subtasksList && subtasksList.map((task, idx) => (
@@ -341,11 +343,12 @@ const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro, setGoal, s
           <>
             {subtasksList.length < 6 &&
             <>
-              <p style={{...pStyle}}>List the steps you think you'll need. <br />(Make sure these are objectives)</p>
+              <p style={{...pStyle, color: '#22191A', fontSize: '14px'}}>List the steps you think you'll need. You will have a chance to add more later.</p>
+              <p style={{...pStyle, color: '#22191A', fontSize: '14px'}}>We will be utilizing the Pomodoro technique (typically 25 minutes followed by a 5 minute break) to help break down the goal into manageable steps, making it easier to stay focused and productive.</p>
               <div style={{...stepStyle}}>
                 <input 
                   style={{...inputStyle, height: '30px'}} 
-                  placeholder={`Step ${subCount}:`} 
+                  placeholder={`Step ${subCount} example: Find a list of 100 basic French words`} 
                   value={subtask} 
                   onChange={handleSubChange}
                   onKeyDown={(e)=> { if (e.key === "Enter") {addSubtask(subtask)}}}
@@ -366,21 +369,22 @@ const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro, setGoal, s
 
         {screen === 3 && (
           <>
-          <p style={{...pStyle}}>Select a task to begin with!</p>
+          <p style={{...pStyle}}>Great! Let's get started!</p>
           <div>
-            <button style={{...continueBtnStyle}} onClick={handleStartTimer}>Go to Timer</button>
-            <button>Clear</button>
+            <button style={{...continueBtnStyle}} onClick={handleStartTimer}>Continue</button>
           </div>
           </>
         )}
 
         {/* Progressbar */}
         <div style={{...progressbarStyle}}>
-          <FontAwesomeIcon icon={screen < 1 ? OpenCircleDot : SolidCircleDot} />
+          {screen === 0 && <FontAwesomeIcon icon={OpenCircleDot} />}
+          {screen === 1 && <FontAwesomeIcon icon={SolidCircleDot} />}
+          {screen > 1 && <FontAwesomeIcon icon={faCircleCheck} />}
           <hr style={{background: '#079455', height: '4px', width: '48px'}}></hr>
-          <FontAwesomeIcon icon={screen < 2 ? OpenCircleDot : SolidCircleDot} />
-          <hr style={{background: '#079455', height: '4px', width: '48px'}}></hr>
-          <FontAwesomeIcon icon={screen < 3 ? OpenCircleDot : SolidCircleDot} />
+          {screen < 2 && <FontAwesomeIcon icon={OpenCircleDot} />}
+          {screen === 2 && <FontAwesomeIcon icon={SolidCircleDot} />}
+          {screen === 3 && <FontAwesomeIcon icon={faCircleCheck} />}
         </div>
       </div>
     </>

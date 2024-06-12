@@ -13,17 +13,25 @@ function (request, sender, sendResponse) {
   if (request.action === "startup") {
     try {
       chrome.storage.sync.get(["focusData"]).then((result) => {
-        if (result.focusData === null) {
-          chrome.storage.sync.set({ "focusData" : { currentGoal: { "subtasks" : [] } } }).then((result) => {sendResponse("returning")})
-        } else {
-          sendResponse("onboarding")
-        }
-      }) 
-      } catch (error) {
-      sendResponse(error);
+        const focusData = result.focusData;
+
+        if (!focusData || (focusData.currentGoal && Object.keys(focusData.currentGoal).length === 0)) {
+          chrome.storage.sync.set({ "focusData": { currentGoal: { "subtasks": [] } } }).then(() => {
+              sendResponse("onboarding");
+          }).catch((error) => {
+              sendResponse(error.message);
+          });
+          } else {
+              sendResponse("returning");
+          }
+      }).catch((error) => {
+          sendResponse(error.message);
+      });
+    } catch (error) {
+      sendResponse(error.message);
     }      
-  return true;
-  }
+    return true; // Indicates that the response is sent asynchronously
+    }
 
   if (request.action === "fetchGoals") {
     chrome.storage.sync.get(["focusData"]).then((result) => {
@@ -57,11 +65,7 @@ function (request, sender, sendResponse) {
         let subtask = {
           name: data[i],
           completed: false,
-          studynotes: null,
-          emoji: null,
-          reflection: null,
-          timestart: null,
-          timeend: null
+          studynotes: null
         }
         existingData.currentGoal["subtasks"].push(subtask)
       }
@@ -72,8 +76,23 @@ function (request, sender, sendResponse) {
     return true;
     }
 
-  
-}
-);
+    if (request.action === "clearGoal") {
+      chrome.storage.sync.get(["focusData"]).then((result)=> {
+        let existingData = result.focusData || { currentGoal: {} };
+
+        existingData.currentGoal =  {};
+
+        chrome.storage.sync.set({ focusData: existingData }).then(() => {
+          sendResponse("cleared");
+          }).catch((error) => {
+              sendResponse({ error: error.message });
+          });
+      }).catch((error) => {
+          sendResponse({ error: error.message });
+      });
+
+    return true; // Indicates that the response is sent asynchronously
+    }
+});
 
 
