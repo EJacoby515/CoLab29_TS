@@ -6,6 +6,7 @@ import { faPen, faPlus, faCircleDot as SolidCircleDot, faCircleCheck } from '@fo
 interface Props {
   setShowPencil:  React.Dispatch<React.SetStateAction<boolean>>;
   setShowPomodoro: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowPrePomodoro: React.Dispatch<React.SetStateAction<boolean>>;
   setGoal: React.Dispatch<React.SetStateAction<string>>;
   setSubtasksList: React.Dispatch<React.SetStateAction<string[]>>;
   userStatus: "returning" | "onboarding" | "";
@@ -24,7 +25,7 @@ interface GoalResponse {
   }]
 }
 
-const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro, setGoal, setSubtasksList, userStatus, setUserStatus }) => {
+const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro, setGoal, setSubtasksList, userStatus, setUserStatus, setShowPrePomodoro }) => {
   const [screen, setScreen] = useState(0);
   const [goal, setLocalGoal] = useState('');
   const [subCount, setSubCount] = useState(1);
@@ -65,14 +66,14 @@ const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro, setGoal, s
 
   const handleStartTimer = () => {
     setShowPencil(false);
-    setShowPomodoro(true);
+    setShowPrePomodoro(true);
     setUserStatus("returning");
   }
 
   const handleGoalSubmit = async () => {
     try {
-      const response = await new Promise((resolve, reject) => {
-        chrome.runtime.sendMessage({ action: "appendCurrentGoal", data: goal}, (response) => {
+      await new Promise((resolve, reject) => {
+        chrome.runtime.sendMessage({ action: "appendCurrentGoal", data: goal }, (response) => {
           if (chrome.runtime.lastError) {
             reject(chrome.runtime.lastError);
           } else {
@@ -80,17 +81,18 @@ const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro, setGoal, s
           }
         });
       });
-      console.log(response);
-      } catch (error) {
-        console.error('Error:', error);
-      };
-    setScreen(prev => (prev + 1))
-  }
+      setGoal(goal);
+      setScreen((prev) => prev + 1);
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+    
 
   const handleSubtasksSubmit = async () => {
     try {
-      const response = await new Promise((resolve, reject) => {
-        chrome.runtime.sendMessage({ action: "appendSubtasks", data: subtasksList}, (response) => {
+      await new Promise((resolve, reject) => {
+        chrome.runtime.sendMessage({ action: "appendSubtasks", data: subtasksList }, (response) => {
           if (chrome.runtime.lastError) {
             reject(chrome.runtime.lastError);
           } else {
@@ -98,17 +100,17 @@ const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro, setGoal, s
           }
         });
       });
-      console.log(response);
-      } catch (error) {
-        console.error('Error:', error);
-      };
-    setScreen(prev => (prev + 1))
-  }
+      setSubtasksList(subtasksList);
+      setScreen((prev) => prev + 1);
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
 
   const fetchGoals = async () => {
     try {
-      const response: GoalResponse = await new Promise((resolve, reject) => {
-        chrome.runtime.sendMessage({ action: "fetchGoals"}, (response) => {
+      const response: { goal: string; subtasks: string[] } = await new Promise((resolve, reject) => {
+        chrome.runtime.sendMessage({ action: "fetchGoals" }, (response) => {
           if (chrome.runtime.lastError) {
             reject(chrome.runtime.lastError);
           } else {
@@ -116,23 +118,13 @@ const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro, setGoal, s
           }
         });
       });
-      
-      setLocalGoal(response.name);
-      let subtasks = []
-      let completed = []
-      for (let i = 0; i < response.subtasks.length; i++) {
-        if (response.subtasks[i].completed === true){
-          completed.push(response.subtasks[i].name)
-        } else{
-          subtasks.push(response.subtasks[i].name)
-        }
-      }
-      setLocalSubtasksList(subtasks);
-      setCompletedSubtasks(completed);
-      } catch (error) {
-        console.log('Error:', error);
-      };
-  }
+  
+      setLocalGoal(response.goal);
+      setLocalSubtasksList(response.subtasks);
+    } catch (error) {
+      console.log('Error:', error);
+    }
+  };
 
   const goalcontainerStyle = {
     position: 'fixed',

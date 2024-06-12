@@ -36,7 +36,10 @@ function (request, sender, sendResponse) {
   if (request.action === "fetchGoals") {
     chrome.storage.sync.get(["focusData"]).then((result) => {
       const existingData = result.focusData || {};
-      sendResponse(existingData.currentGoal)
+      const currentGoal = existingData.currentGoal  || {};
+      const goal  = currentGoal.name || "";
+      const subtaks = currentGoal.subtasks || [];
+      sendResponse({ goal, subtasks });
     })
   return true;
   }
@@ -93,6 +96,63 @@ function (request, sender, sendResponse) {
 
     return true; // Indicates that the response is sent asynchronously
     }
+
+    if (request.action === "saveQuickNotes") {
+      const { notes } = request;
+      chrome.storage.sync.set({ quickNotes: notes }).then(() => {
+        sendResponse({ success: true });
+      }).catch((error) => {
+        sendResponse({ success: false, error: error.message });
+      });
+      return true;
+    }
+
+    if (request.action === "convertQuickNotes") {
+      const { format } = request;
+      chrome.storage.sync.get(["quickNotes"]).then((result) => {
+        const notes = result.quickNotes || "";
+        let fileContent = "";
+
+        switch (format) {
+          case "doc":
+            fileContent = `${notes}`;
+            break;
+          case "txt":
+            fileContent = `${notes}`;
+            break;
+          case "pdf":
+            fileContent = `
+              <html>
+                <head>
+                  <title>Quick Notes</title>
+                  <style>
+                    body { font-family: Arial, sans-serif; }
+                  </style>
+                </head>
+                <body>${notes}</body>
+              </html>
+            `;
+            break;
+          default:
+            sendResponse({ error: "Invalid format" });
+            return;
+        }
+
+        const blob = new Blob([fileContent], { type: format === "pdf" ? "application/pdf" : `text/${format}` });
+        const url = URL.createObjectURL(blob);
+        chrome.downloads.download({
+          url: url,
+          filename: `quicknotes.${format}`,
+          conflictAction: "uniquify",
+        });
+        sendResponse({ success: true });
+      }).catch((error) => {
+        sendResponse({ success: false, error: error.message });
+      });
+      return true;
+    }
 });
+
+
 
 

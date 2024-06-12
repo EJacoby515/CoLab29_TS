@@ -6,12 +6,14 @@ import PomodoroTimer from '../PomodoroTimer/PomodoroTimer';
 import Assessment from '../Assessment/Assessment';
 import Calendar from '../Calendar/Calendar';
 import Alert from '../Alert/Alert';
+import PrePomodoro from '../PrePomodoro/PrePomodoro';
 
 const FloatingMenuButton: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showPencil, setShowPencil] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
   const [showPomodoro, setShowPomodoro] = useState(false);
+  const [showPrePomodoro, setShowPrePomodoro] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [IsTimerStarted, setIsTimerStarted] = useState(false);
   const [showAssessment, setShowAssessment] = useState(false);
@@ -49,13 +51,14 @@ const FloatingMenuButton: React.FC = () => {
 
       else if 
       (userStatus === 'returning') 
-        {setShowPomodoro(true);}
+        {setShowPrePomodoro(true);}
     
     } else {
       setShowCalendar(false);
       setShowPomodoro(false);
       setShowPencil(false);
       setShowAlert(false);
+      setShowPrePomodoro(false);
       }
     setMenuOpen(!menuOpen);
   };
@@ -195,7 +198,20 @@ const FloatingMenuButton: React.FC = () => {
       )}
 
       {showPencil && (
-          <GoalInput setShowPencil={setShowPencil} setShowPomodoro={setShowPomodoro} setGoal={setGoal} setSubtasksList={setSubtasksList} userStatus={userStatus} setUserStatus={setUserStatus}/>)}
+          <GoalInput 
+          setShowPencil={setShowPencil} 
+          setShowPomodoro={setShowPomodoro} 
+          setShowPrePomodoro={setShowPrePomodoro} 
+          setGoal={setGoal} 
+          setSubtasksList={setSubtasksList} 
+          userStatus={userStatus} 
+          setUserStatus={setUserStatus} 
+          />)}
+          {showPrePomodoro && (
+            <div style = {{ position: 'fixed', backgroundColor: 'white', bottom:  '160px', right: '160px'}}>
+              <PrePomodoro goal = {goal} subtasksList = {subtaskList} />
+            </div>
+          )}
       {showPomodoro && (
         <div style={{ 
           position: 'fixed', 
@@ -204,7 +220,12 @@ const FloatingMenuButton: React.FC = () => {
           transform: IsTimerStarted ? 'scale(0.8)' : 'scale(1)',
           transition: 'all 0.8s ease-in-out',
           }}>
-          <PomodoroTimer onTimerStart={handleTimerStart} onTimerFinish={handleTimerFinish} onTimerStop={handleTimerStop} goal={goal}  subtaskList={subtaskList}/>
+          <PomodoroTimer 
+          onTimerStart={handleTimerStart} 
+          onTimerFinish={handleTimerFinish} 
+          onTimerStop={handleTimerStop} 
+          goal={goal}  
+          subtaskList={subtaskList}/>
         </div>
       )}
       {showAssessment && <Assessment onAssessmentSubmit={handleAssessmentSubmit}/>}
