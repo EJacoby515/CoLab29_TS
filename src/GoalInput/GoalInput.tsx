@@ -9,6 +9,7 @@ interface Props {
   setGoal: React.Dispatch<React.SetStateAction<string>>;
   setSubtasksList: React.Dispatch<React.SetStateAction<string[]>>;
   userStatus: "returning" | "onboarding" | "";
+  setUserStatus: React.Dispatch<React.SetStateAction<'returning'|'onboarding'|''>>;
 }
 
 interface GoalResponse {
@@ -23,7 +24,7 @@ interface GoalResponse {
   }]
 }
 
-const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro, setGoal, setSubtasksList, userStatus }) => {
+const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro, setGoal, setSubtasksList, userStatus, setUserStatus }) => {
   const [screen, setScreen] = useState(0);
   const [goal, setLocalGoal] = useState('');
   const [subCount, setSubCount] = useState(1);
@@ -65,6 +66,7 @@ const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro, setGoal, s
   const handleStartTimer = () => {
     setShowPencil(false);
     setShowPomodoro(true);
+    setUserStatus("returning");
   }
 
   const handleGoalSubmit = async () => {
@@ -310,7 +312,7 @@ const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro, setGoal, s
           {/* Set subtasks */}
           {screen > 1 && ( 
           <>
-            <p style={{...goalStyle, display: 'flex', justifyContent: 'start'}}>I will <span style={{fontWeight: 800, textDecoration: 'underline', fontStyle: 'italic'}}> {goal}</span>.</p>
+            <p style={{...goalStyle}}>I will <span style={{fontWeight: 800, textDecoration: 'underline', fontStyle: 'italic'}}> {goal}</span>.</p>
 
             <ol style={{ height: '300px', overflow: 'scroll', paddingLeft: '0'}}>
               {subtasksList && subtasksList.map((task, idx) => (
