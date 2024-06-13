@@ -7,16 +7,21 @@ chrome.action.onClicked.addListener((tab) => {
 
 chrome.runtime.onMessage.addListener(
 function (request, sender, sendResponse) {
-  if (request.greeting === "hello")
-    sendResponse({farewell: "goodbye"});
+  if (request.greeting === "hello"){
+    sendResponse({farewell: "goodbye"});}
 
-  if (request.action === "startup") {
+  else if (request.action === "startup") {
     try {
       chrome.storage.sync.get(["focusData"]).then((result) => {
         const focusData = result.focusData;
 
         if (!focusData || (focusData.currentGoal && Object.keys(focusData.currentGoal).length === 0)) {
-          chrome.storage.sync.set({ "focusData": { currentGoal: { "subtasks": [] } } }).then(() => {
+          const newFocusData = {
+            currentGoal: { subtasks: [] },
+            assessments: focusData ? focusData.assessments || [] : []
+          };
+
+          chrome.storage.sync.set({ "focusData": newFocusData }).then(() => {
               sendResponse("onboarding");
           }).catch((error) => {
               sendResponse(error.message);
@@ -33,7 +38,7 @@ function (request, sender, sendResponse) {
     return true; // Indicates that the response is sent asynchronously
     }
 
-  if (request.action === "fetchGoals") {
+  else if (request.action === "fetchGoals") {
     chrome.storage.sync.get(["focusData"]).then((result) => {
       const existingData = result.focusData || {};
       const currentGoal = existingData.currentGoal  || {};
@@ -44,7 +49,7 @@ function (request, sender, sendResponse) {
   return true;
   }
 
-  if (request.action === "appendCurrentGoal") {
+  else if (request.action === "appendCurrentGoal") {
     const { data } = request;
     chrome.storage.sync.get(["focusData"]).then((result)=>{
       const existingData = result.focusData || {};
@@ -56,7 +61,7 @@ function (request, sender, sendResponse) {
     return true;
     }
 
-  if (request.action === "appendSubtasks") {
+  else if (request.action === "appendSubtasks") {
     const { data } = request;
     console.log(data)
 
@@ -79,7 +84,33 @@ function (request, sender, sendResponse) {
     return true;
     }
 
-    if (request.action === "clearGoal") {
+    else if (request.action === "appendAssessment") {
+      const { date, rating, reflection } = request;
+
+      chrome.storage.sync.get(["focusData"]).then((result)=>{
+        const existingData = result.focusData || {};
+        existingData.currentGoal = existingData.currentGoal || {};
+        existingData.assessments = existingData.assessments || [];
+
+          let entry = {
+            date: date,
+            rating: rating,
+            reflection: reflection
+          }
+          existingData.assessments.push(entry);
+          chrome.storage.sync.set({ focusData: existingData }).then(() => {
+            sendResponse(existingData)
+          }).catch((error) => {
+            sendResponse({ error: error.message });
+        });
+        }).catch((error) => {
+          sendResponse({ error: error.message });
+      });
+
+      return true;
+      }
+
+    else if (request.action === "clearGoal") {
       chrome.storage.sync.get(["focusData"]).then((result)=> {
         let existingData = result.focusData || { currentGoal: {} };
 
