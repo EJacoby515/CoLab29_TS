@@ -1,18 +1,19 @@
 import React, { ReactElement, useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleCheck } from '@fortawesome/free-regular-svg-icons';
+import { faCircle } from '@fortawesome/free-regular-svg-icons';
 import { faChevronLeft, faChevronRight, faPlus } from '@fortawesome/free-solid-svg-icons';
 
 const Calendar: React.FC = () => {
   const [today, setToday] = useState('');
+  const [selectedDay, setSelectedDay] = useState('');
   const [week, setWeek] = useState<string[]>([]);
-  const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
-  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+  // const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
+  // const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 
-  const getDates = () => {
+  const getCurrentDate = () => {
     let date = new Date();
     setToday(date.toDateString());
-    getWeek(new Date(currentYear, currentMonth, 1));
+    getWeek(date);
   };
 
   const getWeek = (date: Date) => {
@@ -31,28 +32,28 @@ const Calendar: React.FC = () => {
   };
 
   useEffect(() => {
-    getDates();
-  }, [currentMonth, currentYear]);
+    getCurrentDate();
+  },[]);
 
-  const goToPreviousWeek = () => {
-    const firstDayOfCurrentWeek = new Date(currentYear, currentMonth, parseInt(week[0].split(' ')[1]));
-    const previousWeek = new Date(firstDayOfCurrentWeek);
-    previousWeek.setDate(firstDayOfCurrentWeek.getDate() - 7);
-    setCurrentMonth(previousWeek.getMonth());
-    setCurrentYear(previousWeek.getFullYear());
-    getWeek(previousWeek);
-  };
+  // const goToPreviousWeek = () => {
+  //   const firstDayOfCurrentWeek = new Date(currentYear, currentMonth, parseInt(week[0].split(' ')[1]));
+  //   const previousWeek = new Date(firstDayOfCurrentWeek);
+  //   previousWeek.setDate(firstDayOfCurrentWeek.getDate() - 7);
+  //   setCurrentMonth(previousWeek.getMonth());
+  //   setCurrentYear(previousWeek.getFullYear());
+  //   getWeek(previousWeek);
+  // };
 
-  const goToNextWeek = () => {
-    const firstDayOfCurrentWeek = new Date(currentYear, currentMonth, parseInt(week[0].split(' ')[1]));
-    const nextWeek = new Date(firstDayOfCurrentWeek);
-    nextWeek.setDate(firstDayOfCurrentWeek.getDate() + 7);
-    if (nextWeek <= new Date()) {
-      setCurrentMonth(nextWeek.getMonth());
-      setCurrentYear(nextWeek.getFullYear());
-      getWeek(nextWeek);
-    }
-  };
+  // const goToNextWeek = () => {
+  //   const firstDayOfCurrentWeek = new Date(currentYear, currentMonth, parseInt(week[0].split(' ')[1]));
+  //   const nextWeek = new Date(firstDayOfCurrentWeek);
+  //   nextWeek.setDate(firstDayOfCurrentWeek.getDate() + 7);
+  //   if (nextWeek <= new Date()) {
+  //     setCurrentMonth(nextWeek.getMonth());
+  //     setCurrentYear(nextWeek.getFullYear());
+  //     getWeek(nextWeek);
+  //   }
+  // };
 
   const calendarcontainerStyle = {
     position: 'fixed',
@@ -63,9 +64,10 @@ const Calendar: React.FC = () => {
     display: 'flex',
     flexDirection: 'column',
     width: '400px',
-    backgroundColor: 'white',
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)',
-    alignItems: 'center'
+    height: '360px',
+    backgroundColor: '#F8F9FF',
+    alignItems: 'center',
+    borderRadius: '12px'
   } as React.CSSProperties;
 
   const weekContainerStyle = {
@@ -78,8 +80,17 @@ const Calendar: React.FC = () => {
     lineHeight: '150%'
   } as React.CSSProperties;
 
+  const reflectionContainerStyle = {
+    backgroundColor: 'white',
+    height: '156px',
+    gap: '12px',
+    width: '311px',
+    borderRadius: '8px',
+    padding: '10px',
+    marginTop: '12px'
+  } as React.CSSProperties;
+
   const pStyle = {
-    color: '#767676',
     fontFamily: 'Arial',
     margin: '5px 0'
   } as React.CSSProperties;
@@ -92,12 +103,18 @@ const Calendar: React.FC = () => {
   } as React.CSSProperties;
 
   const dayIconStyle = {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: 'white',
     padding: '5px',
-    borderRadius: '2px',
-    color: 'lightgray',
-    border: '1px solid #767676',
-    fontSize: '20px'
+    borderRadius: '6px',
+    color: '#EAECF0',
+    border: '1px solid #EAECF0',
+    fontSize: '20px',
+    width: '32px',
+    height: '32px',
+    boxShadow: '0px 1px 2px 0px rgba(16, 24, 40, 0.05)'
   } as React.CSSProperties;
 
   const weekdayContainerStyle = {
@@ -115,71 +132,80 @@ const Calendar: React.FC = () => {
   return (
     <>
       <div style={{ ...calendarcontainerStyle }}>
-        <p style={{ ...pStyle, margin: '0' }}>Today: {today}</p>
-        <div style={{ ...weekContainerStyle }}>
-          <div style={{ ...weekdayContainerStyle }}>
-            <p>Su</p>
-            <a style={{ ...dayIconStyle }}>
-              <FontAwesomeIcon icon={faPlus} />
-            </a>
-          </div>
-          <div style={{ ...weekdayContainerStyle }}>
-            <p>Mo</p>
-            <a style={{ ...dayIconStyle }}>
-              <FontAwesomeIcon icon={faPlus} />
-            </a>
-          </div>
-          <div style={{ ...weekdayContainerStyle }}>
-            <p>Tu</p>
-            <a style={{ ...dayIconStyle }}>
-              <FontAwesomeIcon icon={faPlus} />
-            </a>
-          </div>
-          <div style={{ ...weekdayContainerStyle }}>
-            <p>We</p>
-            <a style={{ ...dayIconStyle }}>
-              <FontAwesomeIcon icon={faPlus} />
-            </a>
-          </div>
-          <div style={{ ...weekdayContainerStyle }}>
-            <p>Th</p>
-            <a style={{ ...dayIconStyle }}>
-              <FontAwesomeIcon icon={faPlus} />
-            </a>
-          </div>
-          <div style={{ ...weekdayContainerStyle }}>
-            <p>Fr</p>
-            <a style={{ ...dayIconStyle }}>
-              <FontAwesomeIcon icon={faPlus} />
-            </a>
-          </div>
-          <div style={{ ...weekdayContainerStyle }}>
-            <p>Sa</p>
-            <a style={{ ...dayIconStyle }}>
-              <FontAwesomeIcon icon={faPlus} />
-            </a>
-          </div>
-        </div>
-        <p style={{ ...pStyle, fontWeight: '600' }}>Session streaks</p>
-        <p style={{ ...pStyle }}>Keep up the good work!</p>
+        
+      <p style={{ ...pStyle, fontWeight: 500, fontSize: '18px', lineHeight: '28px' }}>Trends</p>
+
+        {/* Arrowbuttons */}
         <div style={{ ...navigationStyle }}>
-          <a style={{ ...arrowStyle }} onClick={goToPreviousWeek}>
+          <a style={{ ...arrowStyle }}>
             <FontAwesomeIcon icon={faChevronLeft} />
           </a>
           <div style={{ textAlign: 'center' }}>
-            <p style={{ ...pStyle, color: 'black' }}>
-              {week.length > 0 ? `${week[0]} - ${week[6]}` : ''}
+            <p style={{ ...pStyle, color: 'black', fontSize: '14px' }}>
+              {week[0]} - {week[6]}
             </p>
-            <p style={{ ...pStyle, fontWeight: '600', color: 'black' }}>
-              {new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long' })} {currentYear}
+            <p style={{ ...pStyle, fontWeight: '600', color: 'black', fontSize: '14px' }}>
+              This week
             </p>
           </div>
-          {week.length > 0 && new Date(currentYear, currentMonth, parseInt(week[0].split(' ')[1]) + 7) <= new Date() && (
-            <a style={{ ...arrowStyle }} onClick={goToNextWeek}>
-              <FontAwesomeIcon icon={faChevronRight} />
-            </a>
-          )}
+          <a style={{ ...arrowStyle }}>
+            <FontAwesomeIcon icon={faChevronRight} />
+          </a>
         </div>
+
+        <div style={{ ...weekContainerStyle }}>
+          <div style={{ ...weekdayContainerStyle }}>
+          <p style={{ margin: '2px', fontWeight: '500', color: 'black', fontSize: '14px' }}>Su</p>
+            <a style={{ ...dayIconStyle }}>
+            <FontAwesomeIcon icon={faCircle} />
+            </a>
+          </div>
+          <div style={{ ...weekdayContainerStyle }}>
+          <p style={{ margin: '2px', fontWeight: '500', color: 'black', fontSize: '14px' }}>Mo</p>
+            <a style={{ ...dayIconStyle }}>
+            <FontAwesomeIcon icon={faCircle} />
+            </a>
+          </div>
+          <div style={{ ...weekdayContainerStyle }}>
+          <p style={{ margin: '2px', fontWeight: '500', color: 'black', fontSize: '14px' }}>Tu</p>
+            <a style={{ ...dayIconStyle }}>
+            <FontAwesomeIcon icon={faCircle} />
+            </a>
+          </div>
+          <div style={{ ...weekdayContainerStyle }}>
+          <p style={{ margin: '2px', fontWeight: '500', color: 'black', fontSize: '14px' }}>We</p>
+            <a style={{ ...dayIconStyle }}>
+            <FontAwesomeIcon icon={faCircle} />
+            </a>
+          </div>
+          <div style={{ ...weekdayContainerStyle }}>
+          <p style={{ margin: '2px', fontWeight: '500', color: 'black', fontSize: '14px' }}>Th</p>
+            <a style={{ ...dayIconStyle }}>
+            <FontAwesomeIcon icon={faCircle} />
+            </a>
+          </div>
+          <div style={{ ...weekdayContainerStyle }}>
+          <p style={{ margin: '2px', fontWeight: '500', color: 'black', fontSize: '14px' }}>Fr</p>
+            <a style={{ ...dayIconStyle }}>
+            <FontAwesomeIcon icon={faCircle} />
+            </a>
+          </div>
+          <div style={{ ...weekdayContainerStyle }}>
+          <p style={{ margin: '2px', fontWeight: '500', color: 'black', fontSize: '14px' }}>Sa</p>
+            <a style={{ ...dayIconStyle }}>
+            <FontAwesomeIcon icon={faCircle} />
+            </a>
+          </div>
+        </div>
+
+        <div style={{...reflectionContainerStyle}}>
+          <hr style={{border: '4px solid #EAECF0', background: 'rgba(255, 255, 255, 1)'}} />
+          <p style={{fontFamily: 'Arial', fontWeight: 400, fontSize: '14px', lineHeight: '20px', padding: '12px 14px', borderRadius: '8px', border: '1px solid #D0D5DD', overflowY: 'scroll', height: '105px', margin: 0 }}>
+            {today}
+          </p>
+        </div>
+
+        
       </div>
     </>
   );
