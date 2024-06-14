@@ -5,7 +5,6 @@ import { faPen, faPlus, faCircleDot as SolidCircleDot, faCircleCheck } from '@fo
 
 interface Props {
   setShowPencil:  React.Dispatch<React.SetStateAction<boolean>>;
-  setShowPomodoro: React.Dispatch<React.SetStateAction<boolean>>;
   setShowPrePomodoro: React.Dispatch<React.SetStateAction<boolean>>;
   setGoal: React.Dispatch<React.SetStateAction<string>>;
   setSubtasksList: React.Dispatch<React.SetStateAction<string[]>>;
@@ -16,16 +15,16 @@ interface Props {
 interface GoalResponse {
   name: string,
   subtasks: [{ name: string
-              completed: boolean
-              studynotes: string
-              emoji: null | string
-              reflection: string
-              timestart: string
-              timeend: string
+  completed: boolean
+  studynotes: string
+  emoji: null | string
+  reflection: string
+  timestart: string
+  timeend: string
   }]
 }
 
-const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro, setGoal, setSubtasksList, userStatus, setUserStatus, setShowPrePomodoro }) => {
+const GoalInput: React.FC<Props> = ({ setShowPencil, setGoal, setSubtasksList, userStatus, setUserStatus, setShowPrePomodoro }) => {
   const [screen, setScreen] = useState(0);
   const [goal, setLocalGoal] = useState('');
   const [subCount, setSubCount] = useState(1);

@@ -1,24 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay, faPencilAlt, faRedo } from '@fortawesome/free-solid-svg-icons';
+import PomodoroTimer from '../PomodoroTimer/PomodoroTimer';
 
 interface Props {
   goal: string;
   subtasksList: string[];
+  onSubtaskClick: (subtask: Subtask) =>  void;
+  handleTimerStart: () => void;
+  handleTimerStop: () => void;
 }
 
 interface Subtask {
   id: number;
   title: string;
+  completed: boolean;
 }
 
-const PrePomodoro: React.FC<Props> = ({ goal, subtasksList }) => {
+const PrePomodoro: React.FC<Props> = ({ goal, subtasksList, onSubtaskClick, handleTimerStart, handleTimerStop }) => {
   const [subtasks, setSubtasks] = useState<Subtask[]>([]);
+  const [activeSubtask, setActiveSubtask] = useState<Subtask | null>(null);
+  const [editMode, setEditMode] = useState<number | null>(null);
 
   useEffect(() => {
-   setSubtasks(subtasksList.map((title: string, index: number) => ({id: index, title })));
-   }, [subtasksList]);
-
+    setSubtasks(subtasksList.map((title: string, index: number) => ({ id: index, title, completed: false })));
+  }, [subtasksList]);
 
   const handleSubtaskChange = (id: number, title: string) => {
     const updatedSubtasks = subtasks.map((subtask) => {
@@ -30,100 +36,132 @@ const PrePomodoro: React.FC<Props> = ({ goal, subtasksList }) => {
     setSubtasks(updatedSubtasks);
   };
 
+  const handleSubtaskClick = (subtaskTitle: string) => {
+    setActiveSubtask({ id:  0, title: subtaskTitle,   completed:  false});
+    setEditMode(null);
+  };
+
+  const handleSubtaskCompleted = (subtask: Subtask) => {
+    setActiveSubtask(null);
+    const updatedSubtasks = subtasks.map((st) => {
+      if (st.id === subtask.id) {
+        return { ...st, completed: true };
+      }
+      return st;
+    });
+    setSubtasks(updatedSubtasks);
+  };
+
+  const completedStyle: React.CSSProperties ={
+    textDecoration: 'line-through',
+    color: 'red',
+  }
+
+  const handleRedoSubtask = (subtask: Subtask) => {
+    setActiveSubtask(subtask);
+    const updatedSubtasks = subtasks.map((st) => {
+      if (st.id === subtask.id) {
+        return { ...st, completed: false };
+      }
+      return st;
+    });
+    setSubtasks(updatedSubtasks);
+  };
+
   const handleAddSubtask = () => {
     const newSubtask: Subtask = {
       id: subtasks.length,
       title: '',
+      completed: false,
     };
     setSubtasks([...subtasks, newSubtask]);
+    setEditMode(newSubtask.id);
   };
 
-  const handleStartTimer = (subtaskId?: number) => {
-    if (subtaskId !== undefined) {
-      console.log(`Starting timer for subtask ${subtaskId}`);
-    } else {
-      console.log('Starting timer for the entire goal');
-    }
+  const handleEditSubtask = (id: number) => {
+    setEditMode(id);
   };
 
   const containerStyle: React.CSSProperties = {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'stretch',
-    padding: '20px',
-    backgroundColor: '#f7f7f7',
-    borderRadius: '8px',
-    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-  };
-  
-  const goalStyle: React.CSSProperties = {
-    fontSize: '18px',
-    fontWeight: 'bold',
-    marginBottom: '16px',
-  };
-  
-  const progressBarStyle: React.CSSProperties = {
-    height: '20px',
-    backgroundColor: '#e0e0e0',
-    borderRadius: '4px',
-    marginBottom: '16px',
-  };
-  
-  const subtaskStyle: React.CSSProperties = {
-    display: 'flex',
-    alignItems: 'center',
-    marginBottom: '8px',
-  };
-  
-  const inputStyle: React.CSSProperties = {
-    flex: 1,
-    padding: '8px',
-    border: '1px solid #ccc',
-    borderRadius: '4px',
-    marginRight: '8px',
-  };
-  
-  const buttonStyle: React.CSSProperties = {
-    padding: '8px 16px',
-    backgroundColor: '#38608f',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    marginRight: '8px',
-  };
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'stretch',
+  width: '600px',
+  height: '620px',
+  padding: '32px',
+  backgroundColor: '#F8F9FF',
+  borderRadius: '12px',
+  border: '1px solid #D0D5DD',
+};
+
+const subtaskStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  marginBottom: '10px',
+};
+
+const inputStyle: React.CSSProperties = {
+  flex: 1,
+  marginRight: '10px',
+  padding: '5px',
+  border: '1px solid #D0D5DD',
+  borderRadius: '4px',
+};
+
+const buttonStyle: React.CSSProperties = {
+  marginLeft: '5px',
+  padding: '5px',
+  border: 'none',
+  background: 'transparent',
+  cursor: 'pointer',
+};
+
 
   return (
-        <div style={containerStyle}>
-      <h2 style={goalStyle}>{goal}</h2>
-      <div style={progressBarStyle}>
-        <div style={{ width: '0%', height: '100%', backgroundColor: '#38608f' }} />
-      </div>
-      {subtasks.map((subtask) => (
-        <div key={subtask.id} style={subtaskStyle}>
-          <input
-            type="text"
-            value={subtask.title}
-            onChange={(e) => handleSubtaskChange(subtask.id, e.target.value)}
-            style={inputStyle}
-          />
-          <button onClick={() => handleStartTimer(subtask.id)} style={buttonStyle}>
-            <FontAwesomeIcon icon={faPlay} />
+    <div style={containerStyle}>
+      <h2>{goal}</h2>
+      {activeSubtask ? (
+        <PomodoroTimer
+        onTimerStart={handleTimerStart}
+        onTimerFinish={ () =>  handleSubtaskCompleted(activeSubtask)}
+        onTimerStop={handleTimerStop}
+        subtaskTitle={activeSubtask.title}
+        subtaskList={[]}
+        goal={goal}
+        />
+      ) : (
+        <>
+          {subtasks.map((subtask) => (
+            <div key={subtask.id} style={subtaskStyle}>
+              {editMode === subtask.id ? (
+                <input
+                  type="text"
+                  value={subtask.title}
+                  onChange={(e) => handleSubtaskChange(subtask.id, e.target.value)}
+                  style={inputStyle}
+                  autoFocus
+                />
+              ) : (
+                <span style={subtask.completed ? completedStyle : undefined}>{subtask.title}</span>
+              )}
+              <button onClick={() => handleSubtaskClick(subtask.title)} style={buttonStyle}>
+                <FontAwesomeIcon icon={faPlay} />
+              </button>
+              <button onClick={() => handleEditSubtask(subtask.id)} style={buttonStyle}>
+                <FontAwesomeIcon icon={faPencilAlt} />
+              </button>
+              {subtask.completed && (
+                <button onClick={() => handleRedoSubtask(subtask)} style={buttonStyle}>
+                  <FontAwesomeIcon icon={faRedo} />
+                </button>
+              )}
+            </div>
+          ))}
+          <button onClick={handleAddSubtask} style={{ marginTop: 'auto' }}>
+            Add Subtask
           </button>
-          <button style={buttonStyle}>
-            <FontAwesomeIcon icon={faPencilAlt} />
-          </button>
-          <button style={buttonStyle}>
-            <FontAwesomeIcon icon={faRedo} />
-          </button>
-        </div>
-      ))}
-      <button onClick={handleAddSubtask} style={buttonStyle}>
-        Add Subtask
-      </button>
-      <button onClick={() => handleStartTimer()} style={buttonStyle}>
-        Start Timer
-      </button>
+        </>
+      )}
     </div>
   );
 };
