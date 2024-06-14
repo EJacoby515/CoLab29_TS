@@ -19,12 +19,29 @@ const Assessment: React.FC<{ onAssessmentSubmit: () => void }> = ({onAssessmentS
     setJournal(e.target.value);
   }
 
+  const getStartOfWeek = (date: Date) => {
+    const startOfWeek = new Date(date);
+    const day = startOfWeek.getDay();
+    const diff = startOfWeek.getDate() - day; // adjust for start of week
+    startOfWeek.setDate(diff);
+    startOfWeek.setHours(0, 0, 0, 0); //normalize to midnight
+    return startOfWeek.toISOString().split('T')[0]; // using ISO date format for keys
+  }
+
   const submitAssessment = async (rating:number) => {
     const reflection = journal;
-    const formattedDate = new Date().toISOString();
+    const assessment = {
+      rating: rating,
+      reflection: reflection
+    };
+
+    const date = new Date();
+    const weekKey = getStartOfWeek(date);
+    const dayOfWeek = date.getDay(); // 0 (sunday) to 6 (saturday)
+
     try {
       const response = await new Promise((resolve, reject) => {
-        chrome.runtime.sendMessage({ action: "appendAssessment", date: formattedDate, rating: rating, reflection: reflection}, (response) => {
+        chrome.runtime.sendMessage({ action: "appendAssessment", weekKey: weekKey, dayOfWeek: dayOfWeek, assessment: assessment}, (response) => {
           if (chrome.runtime.lastError) {
             reject(chrome.runtime.lastError);
           } else {

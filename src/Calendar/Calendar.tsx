@@ -4,56 +4,66 @@ import { faCircle } from '@fortawesome/free-regular-svg-icons';
 import { faChevronLeft, faChevronRight, faPlus } from '@fortawesome/free-solid-svg-icons';
 
 const Calendar: React.FC = () => {
-  const [today, setToday] = useState('');
-  const [selectedDay, setSelectedDay] = useState('');
-  const [week, setWeek] = useState<string[]>([]);
-  // const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
-  // const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+  const [weekRange, setWeekRange] = useState<string[]>([]);
+  const [deltaWeeks, setdeltaWeeks] = useState(0);
+  const [dayofweekToday, setdayofweekToday] = useState(7);
+  const [weekText, setweekText] = useState('This Week')
+  const [showReflection, setShowReflection] = useState(7);
+  const weekdays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+  let date = new Date();
 
-  const getCurrentDate = () => {
-    let date = new Date();
-    setToday(date.toDateString());
-    getWeek(date);
+  const getCurrentDate = (date: Date) => {
+    setdayofweekToday(date.getDay());
   };
 
-  const getWeek = (date: Date) => {
-    let start = new Date(date);
-    console.log(start);
-    if (start.getDay() !== 0) {
-      start.setDate(start.getDate() - start.getDay());
-    }
-    let mylst: string[] = [];
-    for (let i = 0; i < 7; i++) {
-      let added = start.toDateString().slice(4, 10);
-      mylst.push(added);
-      start.setDate(start.getDate() + 1);
-    }
-    setWeek([...mylst]);
+  const getWeekRange = (referenceDate: Date, deltaWeeks: number = 0) => {
+    const shortMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  
+    // Calculate the start of the reference week (Sunday)
+    const startOfWeek = new Date(referenceDate);
+    startOfWeek.setDate(referenceDate.getDate() - referenceDate.getDay() + (deltaWeeks * 7));
+    startOfWeek.setHours(0, 0, 0, 0); // Normalize to midnight
+  
+    // Calculate the end of the week (Saturday)
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+  
+    const formatDate = (date: Date): string => {
+      const day = date.getDate();
+      const month = shortMonths[date.getMonth()];
+      return `${month} ${day}`;
+    };
+  
+    const startString = formatDate(startOfWeek);
+    const endString = formatDate(endOfWeek);
+  
+    setWeekRange([startString, endString]);
   };
+  
 
   useEffect(() => {
-    getCurrentDate();
+    getCurrentDate(date);
   },[]);
 
-  // const goToPreviousWeek = () => {
-  //   const firstDayOfCurrentWeek = new Date(currentYear, currentMonth, parseInt(week[0].split(' ')[1]));
-  //   const previousWeek = new Date(firstDayOfCurrentWeek);
-  //   previousWeek.setDate(firstDayOfCurrentWeek.getDate() - 7);
-  //   setCurrentMonth(previousWeek.getMonth());
-  //   setCurrentYear(previousWeek.getFullYear());
-  //   getWeek(previousWeek);
-  // };
+  useEffect(() => {
+    getWeekRange(date, deltaWeeks);
+    if (deltaWeeks === 0) {
+      setdayofweekToday(date.getDay());
+      setweekText('This Week')
+    } else {
+      setdayofweekToday(7);
+      setweekText("Past")
+    }
+  },[deltaWeeks]);
 
-  // const goToNextWeek = () => {
-  //   const firstDayOfCurrentWeek = new Date(currentYear, currentMonth, parseInt(week[0].split(' ')[1]));
-  //   const nextWeek = new Date(firstDayOfCurrentWeek);
-  //   nextWeek.setDate(firstDayOfCurrentWeek.getDate() + 7);
-  //   if (nextWeek <= new Date()) {
-  //     setCurrentMonth(nextWeek.getMonth());
-  //     setCurrentYear(nextWeek.getFullYear());
-  //     getWeek(nextWeek);
-  //   }
-  // };
+  const nextWeek = () => {
+    if (deltaWeeks < 0) {
+    setdeltaWeeks(prev => prev += 1);}
+  };
+  
+  const previousWeek = () => {
+    setdeltaWeeks(prev => prev -= 1);
+  };
 
   const calendarcontainerStyle = {
     position: 'fixed',
@@ -138,70 +148,35 @@ const Calendar: React.FC = () => {
         {/* Arrowbuttons */}
         <div style={{ ...navigationStyle }}>
           <a style={{ ...arrowStyle }}>
-            <FontAwesomeIcon icon={faChevronLeft} />
+            <FontAwesomeIcon icon={faChevronLeft} onClick={()=> previousWeek()} />
           </a>
           <div style={{ textAlign: 'center' }}>
             <p style={{ ...pStyle, color: 'black', fontSize: '14px' }}>
-              {week[0]} - {week[6]}
+              {weekRange[0]} - {weekRange[1]}
             </p>
             <p style={{ ...pStyle, fontWeight: '600', color: 'black', fontSize: '14px' }}>
-              This week
+              {weekText}
             </p>
           </div>
           <a style={{ ...arrowStyle }}>
-            <FontAwesomeIcon icon={faChevronRight} />
+            <FontAwesomeIcon icon={faChevronRight} onClick={()=> nextWeek()} />
           </a>
         </div>
 
         <div style={{ ...weekContainerStyle }}>
-          <div style={{ ...weekdayContainerStyle }}>
-          <p style={{ margin: '2px', fontWeight: '500', color: 'black', fontSize: '14px' }}>Su</p>
-            <a style={{ ...dayIconStyle }}>
+          {weekdays.map((item, idx) => (
+          <div key={idx} style={{ ...weekdayContainerStyle }}>
+          <p style={{ margin: '2px', fontWeight: '500', color: 'black', fontSize: '14px' }}>{item}</p>
+            <a style={{ ...dayIconStyle, border: dayofweekToday === idx ? '2px solid black' : '1px solid #C3C6CF' }}>
             <FontAwesomeIcon icon={faCircle} />
             </a>
           </div>
-          <div style={{ ...weekdayContainerStyle }}>
-          <p style={{ margin: '2px', fontWeight: '500', color: 'black', fontSize: '14px' }}>Mo</p>
-            <a style={{ ...dayIconStyle }}>
-            <FontAwesomeIcon icon={faCircle} />
-            </a>
-          </div>
-          <div style={{ ...weekdayContainerStyle }}>
-          <p style={{ margin: '2px', fontWeight: '500', color: 'black', fontSize: '14px' }}>Tu</p>
-            <a style={{ ...dayIconStyle }}>
-            <FontAwesomeIcon icon={faCircle} />
-            </a>
-          </div>
-          <div style={{ ...weekdayContainerStyle }}>
-          <p style={{ margin: '2px', fontWeight: '500', color: 'black', fontSize: '14px' }}>We</p>
-            <a style={{ ...dayIconStyle }}>
-            <FontAwesomeIcon icon={faCircle} />
-            </a>
-          </div>
-          <div style={{ ...weekdayContainerStyle }}>
-          <p style={{ margin: '2px', fontWeight: '500', color: 'black', fontSize: '14px' }}>Th</p>
-            <a style={{ ...dayIconStyle }}>
-            <FontAwesomeIcon icon={faCircle} />
-            </a>
-          </div>
-          <div style={{ ...weekdayContainerStyle }}>
-          <p style={{ margin: '2px', fontWeight: '500', color: 'black', fontSize: '14px' }}>Fr</p>
-            <a style={{ ...dayIconStyle }}>
-            <FontAwesomeIcon icon={faCircle} />
-            </a>
-          </div>
-          <div style={{ ...weekdayContainerStyle }}>
-          <p style={{ margin: '2px', fontWeight: '500', color: 'black', fontSize: '14px' }}>Sa</p>
-            <a style={{ ...dayIconStyle }}>
-            <FontAwesomeIcon icon={faCircle} />
-            </a>
-          </div>
+          ))}
         </div>
 
         <div style={{...reflectionContainerStyle}}>
           <hr style={{border: '4px solid #EAECF0', background: 'rgba(255, 255, 255, 1)'}} />
           <p style={{fontFamily: 'Arial', fontWeight: 400, fontSize: '14px', lineHeight: '20px', padding: '12px 14px', borderRadius: '8px', border: '1px solid #D0D5DD', overflowY: 'scroll', height: '105px', margin: 0 }}>
-            {today}
           </p>
         </div>
 
