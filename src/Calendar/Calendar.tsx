@@ -2,15 +2,35 @@ import React, {  useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircle } from '@fortawesome/free-regular-svg-icons';
 import { faChevronLeft, faChevronRight, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faFaceSmile, 
+  faFaceMeh, 
+  faFaceFrownOpen,
+  faFaceLaugh} from '@fortawesome/free-regular-svg-icons';
+
+interface Assessment {
+  rating: number;
+  reflection: string;
+}
+
+interface Assessments {
+  [day: number]: Assessment[];
+}
 
 const Calendar: React.FC = () => {
-  const [weekRange, setWeekRange] = useState<string[]>([]);
+  const [weekRange, setWeekRange] = useState<string[] | [null]>([null]);
   const [deltaWeeks, setdeltaWeeks] = useState(0);
   const [dayofweekToday, setdayofweekToday] = useState(7);
-  const [weekText, setweekText] = useState('This Week')
+  const [weekText, setweekText] = useState("")
   const [showReflection, setShowReflection] = useState(7);
   const weekdays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+  const iconName = [faFaceFrownOpen, faFaceMeh, faFaceSmile, faFaceSmile, faFaceLaugh]
+  const [retrievalSunday, setRetrievalSunday] = useState<string|null>(null); 
+  const [assessments, setAssessments] = useState<Assessments>({});
   let date = new Date();
+
+  const translaterating = (num: number) => {
+    return iconName[num];
+  }
 
   const getCurrentDate = (date: Date) => {
     setdayofweekToday(date.getDay());
@@ -23,6 +43,8 @@ const Calendar: React.FC = () => {
     const startOfWeek = new Date(referenceDate);
     startOfWeek.setDate(referenceDate.getDate() - referenceDate.getDay() + (deltaWeeks * 7));
     startOfWeek.setHours(0, 0, 0, 0); // Normalize to midnight
+
+    setRetrievalSunday(startOfWeek.toISOString().split('T')[0]);
   
     // Calculate the end of the week (Saturday)
     const endOfWeek = new Date(startOfWeek);
@@ -39,6 +61,26 @@ const Calendar: React.FC = () => {
   
     setWeekRange([startString, endString]);
   };
+
+  const getWeekData = async (sunday: string): Promise<Assessments> => {
+    try {
+      const response = await new Promise<Assessments>((resolve, reject) => {
+        console.log("sunday I am sending", sunday)
+        const sendingsunday = sunday;
+        chrome.runtime.sendMessage({ action: "fetchAssessment", sunday: sendingsunday }, (response) => {
+          if (chrome.runtime.lastError) {
+            reject(chrome.runtime.lastError);
+          } else {
+            resolve(response);
+          }
+        });
+      });
+      return response;
+      } catch (error) {
+        console.log('Error:', error);
+        return {};
+      };
+  }
   
 
   useEffect(() => {
@@ -52,9 +94,15 @@ const Calendar: React.FC = () => {
       setweekText('This Week')
     } else {
       setdayofweekToday(7);
-      setweekText("Past")
+      setweekText("Past Week")
     }
   },[deltaWeeks]);
+
+  useEffect(() => {
+    if (weekRange && retrievalSunday){
+      getWeekData(retrievalSunday).then(data => setAssessments(data));
+    }
+  }, [weekRange, retrievalSunday])
 
   const nextWeek = () => {
     if (deltaWeeks < 0) {
@@ -164,14 +212,20 @@ const Calendar: React.FC = () => {
         </div>
 
         <div style={{ ...weekContainerStyle }}>
+        {Object.keys(assessments).map(dayNumber => (
+          <>
           {weekdays.map((item, idx) => (
           <div key={idx} style={{ ...weekdayContainerStyle }}>
           <p style={{ margin: '2px', fontWeight: '500', color: 'black', fontSize: '14px' }}>{item}</p>
             <a style={{ ...dayIconStyle, border: dayofweekToday === idx ? '2px solid black' : '1px solid #C3C6CF' }}>
-            <FontAwesomeIcon icon={faCircle} />
+            <FontAwesomeIcon icon={Number(dayNumber) === idx ? translaterating(idx) : faCircle} />
             </a>
           </div>
           ))}
+          </>
+
+        ))}
+        
         </div>
 
         <div style={{...reflectionContainerStyle}}>
