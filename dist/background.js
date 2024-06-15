@@ -43,7 +43,7 @@ function (request, sender, sendResponse) {
       const existingData = result.focusData || {};
       const currentGoal = existingData.currentGoal  || {};
       const goal  = currentGoal.name || "";
-      const subtaks = currentGoal.subtasks || [];
+      const subtasks = currentGoal.subtasks || [];
       sendResponse({ goal, subtasks });
     })
   return true;
@@ -82,6 +82,18 @@ function (request, sender, sendResponse) {
       })
       ;})
     return true;
+    }
+
+    else if (request.action === "fetchAssessment") {
+      const { sunday } = request;
+
+      chrome.storage.sync.get(["focusData"], (result) => {
+        const existingData = result.focusData || {};
+        const assessments = existingData.assessments || {};
+
+        sendResponse(assessments[sunday]);
+      });
+      return true;
     }
 
     else if (request.action === "appendAssessment") {
