@@ -29,6 +29,7 @@ const FloatingMenuButton: React.FC = () => {
   const [subtaskTitle, setSubtaskTitle] = useState('');
   const [userStatus, setUserStatus] = useState<'returning'|'onboarding'|''>('');
 
+
   const getUserStatus = async () => {
     try {
       const response: {} = await new Promise((resolve, reject) => {
@@ -228,6 +229,9 @@ const FloatingMenuButton: React.FC = () => {
               onSubtaskClick={handleSubtaskClick} 
               handleTimerStart={handleTimerStart}
               handleTimerStop={handleTimerStop}
+              showAssessment={showAssessment}
+              setShowAssessment={setShowAssessment}
+              handleAssessmentSubmit={handleAssessmentSubmit}
               />
             </div>
           )}
