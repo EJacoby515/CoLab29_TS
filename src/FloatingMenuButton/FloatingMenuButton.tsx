@@ -57,11 +57,6 @@ const FloatingMenuButton: React.FC = () => {
     if (menuOpen === false) {
       if (userStatus === 'onboarding') 
         {setShowPencil(true);} 
-
-      else if 
-      (userStatus === 'returning') 
-        {setShowPrePomodoro(true);}
-    
     } else {
       setShowCalendar(false);
       setShowPomodoro(false);
@@ -222,9 +217,9 @@ const FloatingMenuButton: React.FC = () => {
           userStatus={userStatus} 
           setUserStatus={setUserStatus} 
           />)}
-          {showPrePomodoro && (
-            <div style = {{ position: 'fixed', backgroundColor: 'white', bottom:  '160px', right: '160px'}}>
-              <PrePomodoro goal = {goal} 
+      {showPrePomodoro && (
+        <div style = {{ position: 'fixed', bottom:  '30px', right: '160px', zIndex: 1000}}>
+          <PrePomodoro goal = {goal} 
               subtasksList = {subtaskList}  
               onSubtaskClick={handleSubtaskClick} 
               handleTimerStart={handleTimerStart}
@@ -233,15 +228,16 @@ const FloatingMenuButton: React.FC = () => {
               setShowAssessment={setShowAssessment}
               handleAssessmentSubmit={handleAssessmentSubmit}
               />
-            </div>
-          )}
+        </div>
+      )}
       {showPomodoro && (
         <div style={{ 
           position: 'fixed', 
-          bottom: IsTimerStarted ? '110px' : '160px',
-          right: IsTimerStarted ? '20px' : '160px',
+          bottom: IsTimerStarted ? '10px' : '20px',
+          right: IsTimerStarted ? '10px' : '160px',
           transform: IsTimerStarted ? 'scale(0.8)' : 'scale(1)',
           transition: 'all 0.8s ease-in-out',
+          zIndex: 1000,
           }}>
           <PomodoroTimer 
           onTimerStart={handleTimerStart} 

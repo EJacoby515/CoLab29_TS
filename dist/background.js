@@ -1,1 +1,215 @@
-chrome.action.onClicked.addListener((e=>{chrome.scripting.executeScript({target:{tabId:e.id},files:["contentScript.js"]})})),chrome.runtime.onMessage.addListener((function(e,s,t){if("hello"===e.greeting)t({farewell:"goodbye"});else{if("startup"===e.action){try{chrome.storage.sync.get(["focusData"]).then((e=>{const s=e.focusData;if(!s||s.currentGoal&&0===Object.keys(s.currentGoal).length){const e={currentGoal:{subtasks:[]},assessments:s&&s.assessments||{}};chrome.storage.sync.set({focusData:e}).then((()=>{t("onboarding")})).catch((e=>{t(e.message)}))}else t("returning")})).catch((e=>{t(e.message)}))}catch(e){t(e.message)}return!0}if("fetchGoals"===e.action)return chrome.storage.sync.get(["focusData"]).then((e=>{const s=(e.focusData||{}).currentGoal||{},a=s.name||"",c=s.subtasks||[];t({goal:a,subtasks:c})})),!0;if("appendCurrentGoal"===e.action){const{data:s}=e;return chrome.storage.sync.get(["focusData"]).then((e=>{const a=e.focusData||{};a.currentGoal={name:s},chrome.storage.sync.set({focusData:a}).then((()=>{t(a)}))})),!0}if("appendSubtasks"===e.action){const{data:s}=e;return console.log(s),chrome.storage.sync.get(["focusData"]).then((e=>{const a=e.focusData||{};a.currentGoal=a.currentGoal||{},a.currentGoal.subtasks=a.currentGoal.subtasks||[];for(let e=0;e<s.length;e++){let t={name:s[e],completed:!1,studynotes:null};a.currentGoal.subtasks.push(t)}chrome.storage.sync.set({focusData:a}).then((()=>{t(a)}))})),!0}if("fetchAssessment"===e.action){const{sunday:s}=e;return chrome.storage.sync.get(["focusData"],(e=>{const a=(e.focusData||{}).assessments||{};t(a[s])})),!0}if("appendAssessment"===e.action){const{weekKey:s,dayOfWeek:a,assessment:c}=e;return chrome.storage.sync.get(["focusData"]).then((e=>{const n=e.focusData||{};n.currentGoal=n.currentGoal||{},n.assessments=n.assessments||{},n.assessments[s]||(n.assessments[s]={}),n.assessments[s][a]||(n.assessments[s][a]=[]),n.assessments[s][a].push(c),chrome.storage.sync.set({focusData:n}).then((()=>{t(n)})).catch((e=>{t({error:e.message})}))})).catch((e=>{t({error:e.message})})),!0}if("clearGoal"===e.action)return chrome.storage.sync.get(["focusData"]).then((e=>{let s=e.focusData||{currentGoal:{}};s.currentGoal={},chrome.storage.sync.set({focusData:s}).then((()=>{t("cleared")})).catch((e=>{t({error:e.message})}))})).catch((e=>{t({error:e.message})})),!0}if("saveQuickNotes"===e.action){const{notes:s}=e;return chrome.storage.sync.set({quickNotes:s}).then((()=>{t({success:!0})})).catch((e=>{t({success:!1,error:e.message})})),!0}if("convertQuickNotes"===e.action){const{format:s}=e;return chrome.storage.sync.get(["quickNotes"]).then((e=>{const a=e.quickNotes||"";let c="";switch(s){case"doc":case"txt":c=`${a}`;break;case"pdf":c=`\n              <html>\n                <head>\n                  <title>Quick Notes</title>\n                  <style>\n                    body { font-family: Arial, sans-serif; }\n                  </style>\n                </head>\n                <body>${a}</body>\n              </html>\n            `;break;default:return void t({error:"Invalid format"})}const n=new Blob([c],{type:"pdf"===s?"application/pdf":`text/${s}`}),o=URL.createObjectURL(n);chrome.downloads.download({url:o,filename:`quicknotes.${s}`,conflictAction:"uniquify"}),t({success:!0})})).catch((e=>{t({success:!1,error:e.message})})),!0}}));
+chrome.action.onClicked.addListener((tab) => {
+  chrome.scripting.executeScript({
+    target: { tabId: tab.id },
+    files: ['contentScript.js']
+  });
+});
+
+chrome.runtime.onMessage.addListener(
+function (request, sender, sendResponse) {
+  if (request.greeting === "hello"){
+    sendResponse({farewell: "goodbye"});}
+
+  else if (request.action === "startup") {
+    try {
+      chrome.storage.sync.get(["focusData"]).then((result) => {
+        const focusData = result.focusData;
+
+        if (!focusData || (focusData.currentGoal && Object.keys(focusData.currentGoal).length === 0)) {
+          const newFocusData = {
+            currentGoal: { subtasks: [] },
+            assessments: focusData ? focusData.assessments || {} : {}
+          };
+
+          chrome.storage.sync.set({ "focusData": newFocusData }).then(() => {
+              sendResponse("onboarding");
+          }).catch((error) => {
+              sendResponse(error.message);
+          });
+          } else {
+              sendResponse("returning");
+          }
+      }).catch((error) => {
+          sendResponse(error.message);
+      });
+    } catch (error) {
+      sendResponse(error.message);
+    }      
+    return true; // Indicates that the response is sent asynchronously
+    }
+
+  else if (request.action === "fetchGoals") {
+    chrome.storage.sync.get(["focusData"]).then((result) => {
+      const existingData = result.focusData || {};
+      const currentGoal = existingData.currentGoal  || {};
+      const goal  = currentGoal.name || "";
+      const subtasks = currentGoal.subtasks || [];
+      sendResponse({ goal, subtasks });
+    })
+  return true;
+  }
+
+  else if (request.action === "appendCurrentGoal") {
+    const { data } = request;
+    chrome.storage.sync.get(["focusData"]).then((result)=>{
+      const existingData = result.focusData || {};
+      existingData["currentGoal"] = {"name": data};
+      chrome.storage.sync.set({ focusData: existingData }).then(() => {
+        sendResponse(existingData)
+      })
+      ;})
+    return true;
+    }
+
+  else if (request.action === "appendSubtasks") {
+    const { data } = request;
+    console.log(data)
+
+    chrome.storage.sync.get(["focusData"]).then((result)=>{
+      const existingData = result.focusData || {};
+      existingData.currentGoal = existingData.currentGoal || {};
+      existingData.currentGoal["subtasks"] = existingData.currentGoal["subtasks"] || [];
+      for (let i = 0; i < data.length; i++) {
+        let subtask = {
+          name: data[i],
+          completed: false,
+          studynotes: null
+        }
+        existingData.currentGoal["subtasks"].push(subtask)
+      }
+      chrome.storage.sync.set({ focusData: existingData }).then(() => {
+        sendResponse(existingData)
+      })
+      ;})
+    return true;
+    }
+
+    else if (request.action === "fetchAssessment") {
+      const { sunday } = request;
+    
+      try {
+        chrome.storage.sync.get(["focusData"], (result) => {
+          const existingData = result.focusData || {};
+          const assessments = existingData.assessments || {};
+    
+          if (assessments[sunday]) {
+            sendResponse(assessments[sunday]);
+          } else {
+            sendResponse(null);
+          }
+        });
+      } catch (error) {
+        console.error("Error fetching assessments:", error);
+        sendResponse(null);
+      }
+      return true; // This is necessary to indicate asynchronous response
+    }
+    
+
+    else if (request.action === "appendAssessment") {
+      const { weekKey, dayOfWeek, assessment } = request;
+
+      chrome.storage.sync.get(["focusData"]).then((result)=>{
+        const existingData = result.focusData || {};
+        existingData.currentGoal = existingData.currentGoal || {};
+        existingData.assessments = existingData.assessments || {};
+
+        if (!existingData.assessments[weekKey]) {
+          existingData.assessments[weekKey] = {};
+        }
+
+        if (!existingData.assessments[weekKey][dayOfWeek]) {
+          existingData.assessments[weekKey][dayOfWeek] = [];
+        }
+
+        existingData.assessments[weekKey][dayOfWeek].push(assessment);
+
+        chrome.storage.sync.set({ focusData: existingData }).then(() => {
+          sendResponse(existingData)
+        }).catch((error) => {
+          sendResponse({ error: error.message });
+      });
+      }).catch((error) => {
+        sendResponse({ error: error.message });
+    });
+
+    return true;
+    }
+
+    else if (request.action === "clearGoal") {
+      chrome.storage.sync.get(["focusData"]).then((result)=> {
+        let existingData = result.focusData || { currentGoal: {} };
+
+        existingData.currentGoal =  {};
+
+        chrome.storage.sync.set({ focusData: existingData }).then(() => {
+          sendResponse("cleared");
+          }).catch((error) => {
+              sendResponse({ error: error.message });
+          });
+      }).catch((error) => {
+          sendResponse({ error: error.message });
+      });
+
+    return true; // Indicates that the response is sent asynchronously
+    }
+
+    if (request.action === "saveQuickNotes") {
+      const { notes } = request;
+      chrome.storage.sync.set({ quickNotes: notes }).then(() => {
+        sendResponse({ success: true });
+      }).catch((error) => {
+        sendResponse({ success: false, error: error.message });
+      });
+      return true;
+    }
+
+    if (request.action === "convertQuickNotes") {
+      const { format } = request;
+      chrome.storage.sync.get(["quickNotes"]).then((result) => {
+        const notes = result.quickNotes || "";
+        let fileContent = "";
+
+        switch (format) {
+          case "doc":
+            fileContent = `${notes}`;
+            break;
+          case "txt":
+            fileContent = `${notes}`;
+            break;
+          case "pdf":
+            fileContent = `
+              <html>
+                <head>
+                  <title>Quick Notes</title>
+                  <style>
+                    body { font-family: Arial, sans-serif; }
+                  </style>
+                </head>
+                <body>${notes}</body>
+              </html>
+            `;
+            break;
+          default:
+            sendResponse({ error: "Invalid format" });
+            return;
+        }
+
+        const blob = new Blob([fileContent], { type: format === "pdf" ? "application/pdf" : `text/${format}` });
+        const url = URL.createObjectURL(blob);
+        chrome.downloads.download({
+          url: url,
+          filename: `quicknotes.${format}`,
+          conflictAction: "uniquify",
+        });
+        sendResponse({ success: true });
+      }).catch((error) => {
+        sendResponse({ success: false, error: error.message });
+      });
+      return true;
+    }
+});
+
+
+
+

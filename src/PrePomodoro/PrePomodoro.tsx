@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlay, faPencilAlt, faRedo } from '@fortawesome/free-solid-svg-icons';
+import { faPlay, faPencilAlt, faRepeat, faPlus } from '@fortawesome/free-solid-svg-icons';
 import PomodoroTimer from '../PomodoroTimer/PomodoroTimer';
 import Assessment from '../Assessment/Assessment';
 
@@ -105,18 +105,23 @@ const PrePomodoro: React.FC<Props> = ({ goal, subtasksList, onSubtaskClick, hand
   const containerStyle: React.CSSProperties = {
     display: 'flex',
     flexDirection: 'column',
+    justifyContent: 'center',
     alignItems: 'stretch',
     minWidth: '375px',
     padding: '24px',
-    backgroundColor: '#FFFFFF',
-    borderRadius: '8px',
-    boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
+    backgroundColor: '#F8F9FF',
+    borderRadius: '12px',
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+    width: '500px',
+    height: '500px',
+    border: '1px solid #D0D5DD',
     fontFamily: 'Inter, sans-serif',
   };
 
   const goalStyle: React.CSSProperties = {
     fontSize: '18px',
-    fontWeight: 600,
+    fontWeight: 500,
+    fontFamily: 'Arial',
     marginBottom: '16px',
   };
 
@@ -132,6 +137,11 @@ const PrePomodoro: React.FC<Props> = ({ goal, subtasksList, onSubtaskClick, hand
   };
 
   const subtaskTitleStyle: React.CSSProperties = {
+    flex: 1,
+    padding: '8px',
+    border: '1px solid #ccc',
+    borderRadius: '4px',
+    marginRight: '8px',
     fontSize: '16px',
     fontWeight: 500,
     marginBottom: '8px',
@@ -152,12 +162,13 @@ const PrePomodoro: React.FC<Props> = ({ goal, subtasksList, onSubtaskClick, hand
   };
 
   const buttonStyle: React.CSSProperties = {
-    padding: '8px 16px',
+    padding: '8px 14px',
     backgroundColor: '#38608F',
     color: '#FFFFFF',
-    border: 'none',
     borderRadius: '4px',
+    border: '1px solid #DCDFEA',
     cursor: 'pointer',
+    marginRight: '8px',
     fontFamily: 'Inter, sans-serif',
     fontSize: '14px',
     fontWeight: 500,
@@ -176,7 +187,7 @@ const PrePomodoro: React.FC<Props> = ({ goal, subtasksList, onSubtaskClick, hand
   };
 
   return (
-    <div style={containerStyle}>
+      <div style={containerStyle}>
       {showAssessment ? (
         <Assessment onAssessmentSubmit={handleAssessmentSubmit} />
       ) : (
@@ -217,19 +228,21 @@ const PrePomodoro: React.FC<Props> = ({ goal, subtasksList, onSubtaskClick, hand
                     </button>
                     {subtask.completed && (
                       <button onClick={() => handleRedoSubtask(subtask)} style={buttonStyle}>
-                        <FontAwesomeIcon icon={faRedo} />
+                        <FontAwesomeIcon icon={faRepeat} />
                       </button>
                     )}
                   </div>
                 </div>
               ))}
+              
               <button onClick={handleAddSubtask} style={addButtonStyle}>
-                Add Subtask
+                Add Subtask <FontAwesomeIcon icon={faPlus} />
               </button>
             </>
           )}
         </>
       )}
+
     </div>
   );
 };

@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircleDown, faX } from '@fortawesome/free-solid-svg-icons';
 
 const QuickNotes: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [notes, setNotes] = useState('');
@@ -27,21 +29,15 @@ const QuickNotes: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     });
   };
 
-  const notesContainerStyle: React.CSSProperties = {
-    backgroundColor: '#F8F9FF',
-    padding: '20px',
-    borderRadius: '8px',
-    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-    marginTop: '20px',
-  };
-
   const notesTextareaStyle: React.CSSProperties = {
-    width: '100%',
     resize: 'vertical',
+    width: '250px',
+    height: '154px',
     padding: '8px',
     border: '1px solid #D0D5DD',
     borderRadius: '4px',
     marginBottom: '16px',
+    fontFamily: 'Roboto',
   };
 
   const notesSaveButtonStyle: React.CSSProperties = {
@@ -55,33 +51,35 @@ const QuickNotes: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   };
 
   return (
-    <div style={notesContainerStyle}>
-      <h4>Add study notes here:</h4>
+    <>
       <textarea
         value={notes}
         onChange={handleNoteChange}
-        placeholder="Type your notes..."
-        rows={4}
+        placeholder="Add study notes here"
         style={notesTextareaStyle}
       />
       <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
         <button onClick={() => convertNotes('doc')} style={notesSaveButtonStyle}>
-          Save as .doc
+          <FontAwesomeIcon icon={faCircleDown} />
         </button>
-        <button onClick={() => convertNotes('txt')} style={notesSaveButtonStyle}>
-          Save as .txt
+
+        {/* Hey Eric... I feel all the buttons are a little distracting so maybe we  just pick one file type and have that be the "download" button? */}
+
+        {/* <button onClick={() => convertNotes('txt')} style={notesSaveButtonStyle}>
+          <FontAwesomeIcon icon={faCircleDown} /> .txt
         </button>
         <button onClick={() => convertNotes('pdf')} style={notesSaveButtonStyle}>
-          Save as .pdf
+          <FontAwesomeIcon icon={faCircleDown} /> .pdf
         </button>
         <button onClick={saveNotes} style={notesSaveButtonStyle}>
           Save
-        </button>
+        </button> */}
+
         <button onClick={onClose} style={notesSaveButtonStyle}>
-          Close
+          <FontAwesomeIcon icon={faX} />
         </button>
       </div>
-    </div>
+    </>
   );
 };
 
