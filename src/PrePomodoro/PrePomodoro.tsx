@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay, faPencilAlt, faRepeat, faPlus } from '@fortawesome/free-solid-svg-icons';
 import PomodoroTimer from '../PomodoroTimer/PomodoroTimer';
-import Assessment from '../Assessment/Assessment';
+import Assessment, { AssessmentData } from '../Assessment/Assessment';
 
 interface Props {
   goal: string;
@@ -12,9 +12,9 @@ interface Props {
   handleTimerStop: () => void;
   showAssessment: boolean;
   setShowAssessment: React.Dispatch<React.SetStateAction<boolean>>;
-  handleAssessmentSubmit: () => void;
+  handleAssessmentSubmit: (assessment: AssessmentData) => void;
+  assessment: { [week: string]: { [day: number]: AssessmentData[] } };
 }
-
 interface Subtask {
   id: number;
   title: string;
@@ -190,7 +190,9 @@ const PrePomodoro: React.FC<Props> = ({ goal, subtasksList, onSubtaskClick, hand
   return (
       <div style={containerStyle}>
       {showAssessment ? (
-        <Assessment onAssessmentSubmit={handleAssessmentSubmit} />
+        <Assessment
+        onAssessmentSubmit={(assessment: AssessmentData) => handleAssessmentSubmit(assessment)}
+        assessment={{ rating: 0, reflection: '' }} />
       ) : (
         <>
           <h2 style={goalStyle}>{goal}</h2>
@@ -222,20 +224,22 @@ const PrePomodoro: React.FC<Props> = ({ goal, subtasksList, onSubtaskClick, hand
                   </div>
                   <div style={subtaskButtonsStyle}>
                     <button onClick={() => handleSubtaskClick(subtask)} style={buttonStyle}>
-                      <FontAwesomeIcon icon={faPlay} />
+                      <FontAwesomeIcon icon={faPlay}  /> Start Timer
                     </button>
                     <button onClick={() => handleEditSubtask(subtask.id)} style={buttonStyle}>
-                      <FontAwesomeIcon icon={faPencilAlt} />
+                       <FontAwesomeIcon icon={faPencilAlt} /> Edit Task
                     </button>
                     {subtask.completed && (
                       <button onClick={() => handleRedoSubtask(subtask)} style={buttonStyle}>
-                        <FontAwesomeIcon icon={faRepeat} />
+                        <FontAwesomeIcon icon={faRepeat} /> Repeat Task
                       </button>
                     )}
                   </div>
                 </div>
               ))}
-              
+              <button onClick={handleTimerStart} style={addButtonStyle}>
+                Start Pomodoro Timer <FontAwesomeIcon icon={faPlay} />
+              </button>
               <button onClick={handleAddSubtask} style={addButtonStyle}>
                 Add Subtask <FontAwesomeIcon icon={faPlus} />
               </button>

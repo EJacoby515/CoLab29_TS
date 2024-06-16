@@ -7,6 +7,7 @@ import Assessment from '../Assessment/Assessment';
 import Calendar from '../Calendar/Calendar';
 import Alert from '../Alert/Alert';
 import PrePomodoro from '../PrePomodoro/PrePomodoro';
+import CongratulationAnimation from '../CongratulationAnimation/CongratulationAnimation';
 
 interface Subtask {
   id: number;
@@ -14,8 +15,17 @@ interface Subtask {
   completed: boolean;
 }
 
+interface Assessment {
+  rating: number;
+  reflection: string;
+}
 
-const FloatingMenuButton: React.FC = () => {
+interface Props {
+  handleAssessmentSubmit: (assessment: Assessment) => void;
+}
+
+
+const FloatingMenuButton: React.FC<Props> = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showPencil, setShowPencil] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
@@ -28,6 +38,8 @@ const FloatingMenuButton: React.FC = () => {
   const [subtaskList, setSubtasksList] = useState<string[]>([]);
   const [subtaskTitle, setSubtaskTitle] = useState('');
   const [userStatus, setUserStatus] = useState<'returning'|'onboarding'|''>('');
+  const [assessments, setAssessments] = useState<{ [week: string]: { [day: number]: Assessment[] } }>({});
+  const [showCongratulationsAnimation, setShowCongratulationAnimation] = useState(false);
 
 
   const getUserStatus = async () => {
@@ -85,10 +97,24 @@ const FloatingMenuButton: React.FC = () => {
     setIsTimerStarted(false);
   }
 
-  const handleAssessmentSubmit =() => {
+  const handleAssessmentSubmit = (assessment: Assessment ) => {
     setShowAssessment(false);
     setShowPomodoro(false);
+    setShowPrePomodoro(true);
+    setShowCongratulationAnimation(true);
   }
+
+  const getStartOfWeek = (date:Date) => {
+    const startOfWeek = new Date(date);
+    const day = startOfWeek.getDay();
+    const diff = startOfWeek.getDate() - day;
+    startOfWeek.setDate(diff);
+    startOfWeek.setHours( 0,0,0,0 );
+    return startOfWeek.toISOString().split('T')[0];
+
+  }
+    
+
 
   const handlePomodoroClick = () => {
     setShowPomodoro(!showPomodoro);
@@ -219,7 +245,8 @@ const FloatingMenuButton: React.FC = () => {
           />)}
       {showPrePomodoro && (
         <div style = {{ position: 'fixed', bottom:  '30px', right: '160px', zIndex: 1000}}>
-          <PrePomodoro goal = {goal} 
+          <PrePomodoro 
+              goal = {goal} 
               subtasksList = {subtaskList}  
               onSubtaskClick={handleSubtaskClick} 
               handleTimerStart={handleTimerStart}
@@ -227,6 +254,7 @@ const FloatingMenuButton: React.FC = () => {
               showAssessment={showAssessment}
               setShowAssessment={setShowAssessment}
               handleAssessmentSubmit={handleAssessmentSubmit}
+              assessment={assessments}
               />
         </div>
       )}
@@ -248,11 +276,17 @@ const FloatingMenuButton: React.FC = () => {
           subtaskList={subtaskList}/>
         </div>
       )}
-      {showAssessment && <Assessment onAssessmentSubmit={handleAssessmentSubmit}/>}
-      {showCalendar && <Calendar/>}
+  {showAssessment && (
+    <Assessment
+      onAssessmentSubmit={handleAssessmentSubmit}
+      assessment={assessments[getStartOfWeek(new Date())]?.[new Date().getDay()]?.[0] || { rating: 0, reflection: '' }}
+    />
+  )}
+      {showCongratulationsAnimation && <CongratulationAnimation />}
+      {showCalendar && <Calendar assessments={assessments}/>}
       {showAlert && (<Alert setShowAlert={setShowAlert} setUserStatus={setUserStatus}/>)}
     </>
   );
-};
+}
 
 export default FloatingMenuButton;

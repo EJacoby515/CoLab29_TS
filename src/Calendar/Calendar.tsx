@@ -16,7 +16,11 @@ interface Assessments {
   [day: number]: Assessment[];
 }
 
-const Calendar: React.FC = () => {
+interface Props {
+  assessments: {[week: string]: {[day: number]: Assessment[] } };
+}
+
+const Calendar: React.FC<Props> = () => {
   const [weekRange, setWeekRange] = useState<string[] | [null]>([null]);
   const [deltaWeeks, setdeltaWeeks] = useState(0);
   const [dayofweekToday, setdayofweekToday] = useState(7);

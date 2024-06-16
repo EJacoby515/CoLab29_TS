@@ -1,15 +1,20 @@
-import React, {  useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFaceSmile as faFaceSmileSolid, 
-          faFaceMeh as faFaceMehSolid,
-          faFaceFrownOpen as faFaceFrownSolid,
-          faFaceLaugh as faFaceLaughSolid} from '@fortawesome/free-solid-svg-icons';
-import { faFaceSmile as faFaceSmileLine, 
-          faFaceMeh as faFaceMehLine, 
-          faFaceFrownOpen as faFaceFrownOpenLine,
-          faFaceLaugh as faFaceLaughLine} from '@fortawesome/free-regular-svg-icons';
+import { faFaceSmile as faFaceSmileSolid, faFaceMeh as faFaceMehSolid, faFaceFrownOpen as faFaceFrownSolid, faFaceLaugh as faFaceLaughSolid } from '@fortawesome/free-solid-svg-icons';
+import { faFaceSmile as faFaceSmileLine, faFaceMeh as faFaceMehLine, faFaceFrownOpen as faFaceFrownOpenLine, faFaceLaugh as faFaceLaughLine } from '@fortawesome/free-regular-svg-icons';
 
-const Assessment: React.FC<{ onAssessmentSubmit: () => void }> = ({onAssessmentSubmit}) => {
+interface Props {
+  onAssessmentSubmit: (assessment: AssessmentData) => void;
+  assessment: AssessmentData;
+}
+
+export interface AssessmentData {
+  rating: number;
+  reflection: string;
+}
+
+
+const Assessment: React.FC<Props> = ({ onAssessmentSubmit, assessment }) => {
   const [journal, setJournal] = useState('');
   const [emoji, setEmoji] = useState(0);
   const [submitHovered, setsubmitHovered] = useState(false);
@@ -50,7 +55,7 @@ const Assessment: React.FC<{ onAssessmentSubmit: () => void }> = ({onAssessmentS
         });
       });
       console.log(response);
-      onAssessmentSubmit();
+      onAssessmentSubmit(assessment);
       } catch (error) {
         console.log('Error:', error);
       };

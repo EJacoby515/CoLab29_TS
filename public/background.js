@@ -91,12 +91,7 @@ function (request, sender, sendResponse) {
         chrome.storage.sync.get(["focusData"], (result) => {
           const existingData = result.focusData || {};
           const assessments = existingData.assessments || {};
-    
-          if (assessments[sunday]) {
-            sendResponse(assessments[sunday]);
-          } else {
-            sendResponse(null);
-          }
+          sendResponse(assessments[sunday] || null);
         });
       } catch (error) {
         console.error("Error fetching assessments:", error);
@@ -108,32 +103,30 @@ function (request, sender, sendResponse) {
 
     else if (request.action === "appendAssessment") {
       const { weekKey, dayOfWeek, assessment } = request;
-
-      chrome.storage.sync.get(["focusData"]).then((result)=>{
+    
+      chrome.storage.sync.get(["focusData"], (result) => {
         const existingData = result.focusData || {};
         existingData.currentGoal = existingData.currentGoal || {};
         existingData.assessments = existingData.assessments || {};
-
+    
         if (!existingData.assessments[weekKey]) {
           existingData.assessments[weekKey] = {};
         }
-
+    
         if (!existingData.assessments[weekKey][dayOfWeek]) {
           existingData.assessments[weekKey][dayOfWeek] = [];
         }
-
+    
         existingData.assessments[weekKey][dayOfWeek].push(assessment);
-
-        chrome.storage.sync.set({ focusData: existingData }).then(() => {
-          sendResponse(existingData)
-        }).catch((error) => {
-          sendResponse({ error: error.message });
+    
+        chrome.storage.sync.set({ focusData: existingData }, () => {
+          const updatedAssessments = existingData.assessments;
+          const formattedResponse = { [weekKey]: { [dayOfWeek]: updatedAssessments[weekKey][dayOfWeek] } };
+          sendResponse(formattedResponse);
+        });
       });
-      }).catch((error) => {
-        sendResponse({ error: error.message });
-    });
-
-    return true;
+    
+      return true;
     }
 
     else if (request.action === "clearGoal") {
