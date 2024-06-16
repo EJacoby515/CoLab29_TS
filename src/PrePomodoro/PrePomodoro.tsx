@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlay, faPencilAlt, faRedo } from '@fortawesome/free-solid-svg-icons';
+import { faPlay, faPencilAlt, faRepeat, faPlus } from '@fortawesome/free-solid-svg-icons';
 
 interface Props {
   goal: string;
@@ -49,16 +49,21 @@ const PrePomodoro: React.FC<Props> = ({ goal, subtasksList }) => {
   const containerStyle: React.CSSProperties = {
     display: 'flex',
     flexDirection: 'column',
+    justifyContent: 'center',
     alignItems: 'stretch',
     padding: '20px',
-    backgroundColor: '#f7f7f7',
-    borderRadius: '8px',
+    backgroundColor: '#F8F9FF',
+    borderRadius: '12px',
     boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+    width: '500px',
+    height: '500px',
+    border: '1px solid #D0D5DD'
   };
   
   const goalStyle: React.CSSProperties = {
     fontSize: '18px',
-    fontWeight: 'bold',
+    fontWeight: 500,
+    fontFamily: 'Arial',
     marginBottom: '16px',
   };
   
@@ -81,23 +86,25 @@ const PrePomodoro: React.FC<Props> = ({ goal, subtasksList }) => {
     border: '1px solid #ccc',
     borderRadius: '4px',
     marginRight: '8px',
+    marginBottom: 0,
   };
   
   const buttonStyle: React.CSSProperties = {
-    padding: '8px 16px',
-    backgroundColor: '#38608f',
+    padding: '8px 14px',
+    fontWeight: 500,
+    backgroundColor: '#38608F',
     color: '#fff',
-    border: 'none',
-    borderRadius: '4px',
+    border: '1px solid #DCDFEA',
+    borderRadius: '8px',
     cursor: 'pointer',
-    marginRight: '8px',
+    marginRight: '8px'
   };
 
   return (
         <div style={containerStyle}>
       <h2 style={goalStyle}>{goal}</h2>
       <div style={progressBarStyle}>
-        <div style={{ width: '0%', height: '100%', backgroundColor: '#38608f' }} />
+        <div style={{ width: '0%', height: '4px', backgroundColor: '#EAECF0' }} />
       </div>
       {subtasks.map((subtask) => (
         <div key={subtask.id} style={subtaskStyle}>
@@ -114,15 +121,15 @@ const PrePomodoro: React.FC<Props> = ({ goal, subtasksList }) => {
             <FontAwesomeIcon icon={faPencilAlt} />
           </button>
           <button style={buttonStyle}>
-            <FontAwesomeIcon icon={faRedo} />
+            <FontAwesomeIcon icon={faRepeat} />
           </button>
         </div>
       ))}
-      <button onClick={handleAddSubtask} style={buttonStyle}>
-        Add Subtask
-      </button>
       <button onClick={() => handleStartTimer()} style={buttonStyle}>
-        Start Timer
+        Start Timer <FontAwesomeIcon style={{marginLeft: '4px'}} icon={faPlay} />
+      </button>
+      <button onClick={handleAddSubtask} style={{...buttonStyle, backgroundColor: '#D7E3F8', color: 'black', marginTop: '12px'}}>
+        Add Subtask <FontAwesomeIcon icon={faPlus} />
       </button>
     </div>
   );

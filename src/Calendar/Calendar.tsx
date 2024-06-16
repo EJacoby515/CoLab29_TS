@@ -21,16 +21,11 @@ const Calendar: React.FC = () => {
   const [deltaWeeks, setdeltaWeeks] = useState(0);
   const [dayofweekToday, setdayofweekToday] = useState(7);
   const [weekText, setweekText] = useState("")
-  const [showReflection, setShowReflection] = useState(7);
+  const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const weekdays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
-  const iconName = [faFaceFrownOpen, faFaceMeh, faFaceSmile, faFaceSmile, faFaceLaugh]
   const [retrievalSunday, setRetrievalSunday] = useState<string|null>(null); 
   const [assessments, setAssessments] = useState<Assessments>({});
   let date = new Date();
-
-  const translaterating = (num: number) => {
-    return iconName[num];
-  }
 
   const getCurrentDate = (date: Date) => {
     setdayofweekToday(date.getDay());
@@ -75,13 +70,29 @@ const Calendar: React.FC = () => {
           }
         });
       });
-      return response;
+      return response || {};
       } catch (error) {
         console.log('Error:', error);
         return {};
       };
   }
-  
+
+  const translateRating = (rating: number) => {
+    switch (rating) {
+      case 1:
+        return { icon: faFaceFrownOpen, color: '#E31B54' };
+      case 2:
+        return { icon: faFaceMeh, color: '#FF692E' };
+      case 3:
+        return { icon: faFaceSmile, color: '#EAAA08' };
+      case 4:
+        return { icon: faFaceSmile, color: '#66C61C' };
+      case 5:
+        return { icon: faFaceLaugh, color: '#099250' };
+      default:
+        return { icon: faCircle, color: '#EAECF0' };
+    }
+  };
 
   useEffect(() => {
     getCurrentDate(date);
@@ -164,7 +175,6 @@ const Calendar: React.FC = () => {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'white',
     padding: '5px',
     borderRadius: '6px',
     color: '#EAECF0',
@@ -172,7 +182,8 @@ const Calendar: React.FC = () => {
     fontSize: '20px',
     width: '32px',
     height: '32px',
-    boxShadow: '0px 1px 2px 0px rgba(16, 24, 40, 0.05)'
+    boxShadow: '0px 1px 2px 0px rgba(16, 24, 40, 0.05)',
+    cursor: 'pointer',
   } as React.CSSProperties;
 
   const weekdayContainerStyle = {
@@ -194,8 +205,8 @@ const Calendar: React.FC = () => {
       <p style={{ ...pStyle, fontWeight: 500, fontSize: '18px', lineHeight: '28px' }}>Trends</p>
 
         {/* Arrowbuttons */}
-        <div style={{ ...navigationStyle }}>
-          <a style={{ ...arrowStyle }}>
+        <div style={navigationStyle}>
+          <a style={arrowStyle}>
             <FontAwesomeIcon icon={faChevronLeft} onClick={()=> previousWeek()} />
           </a>
           <div style={{ textAlign: 'center' }}>
@@ -212,28 +223,36 @@ const Calendar: React.FC = () => {
         </div>
 
         <div style={{ ...weekContainerStyle }}>
-        {Object.keys(assessments).map(dayNumber => (
-          <>
           {weekdays.map((item, idx) => (
-          <div key={idx} style={{ ...weekdayContainerStyle }}>
+          <div key={idx} style={weekdayContainerStyle}>
           <p style={{ margin: '2px', fontWeight: '500', color: 'black', fontSize: '14px' }}>{item}</p>
-            <a style={{ ...dayIconStyle, border: dayofweekToday === idx ? '2px solid black' : '1px solid #C3C6CF' }}>
-            <FontAwesomeIcon icon={Number(dayNumber) === idx ? translaterating(idx) : faCircle} />
+            <a style={{ ...dayIconStyle, border: selectedDay === idx ?  '2px solid black' : '1px solid #EAECF0' }} onClick={() => setSelectedDay(idx)}>
+            {assessments[idx] && assessments[idx][0] ? (
+              <FontAwesomeIcon icon={translateRating(assessments[idx][0].rating).icon} color={translateRating(assessments[idx][0].rating).color} />
+            ) : (
+              <FontAwesomeIcon icon={faCircle} color={dayofweekToday === idx ? '#3B7C0F' : '#EAECF0'} />
+            )}
             </a>
           </div>
           ))}
-          </>
-
-        ))}
         
         </div>
+
+        {selectedDay !== null && assessments[selectedDay] && assessments[selectedDay][0] ? (
+        <div style={reflectionContainerStyle}>
+          <hr style={{ border: '4px solid #3B7C0F', background: 'rgba(255, 255, 255, 1)' }} />
+          <p style={{ fontFamily: 'Arial', fontWeight: 400, fontSize: '14px', lineHeight: '20px', padding: '12px 14px', borderRadius: '8px', border: '1px solid #D0D5DD', overflowY: 'scroll', height: '105px', margin: 0 }}>
+            {assessments[selectedDay][0].reflection}
+          </p>
+        </div>
+      ) : 
 
         <div style={{...reflectionContainerStyle}}>
           <hr style={{border: '4px solid #EAECF0', background: 'rgba(255, 255, 255, 1)'}} />
           <p style={{fontFamily: 'Arial', fontWeight: 400, fontSize: '14px', lineHeight: '20px', padding: '12px 14px', borderRadius: '8px', border: '1px solid #D0D5DD', overflowY: 'scroll', height: '105px', margin: 0 }}>
           </p>
         </div>
-
+      }
         
       </div>
     </>

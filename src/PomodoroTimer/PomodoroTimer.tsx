@@ -1,6 +1,6 @@
 // PomodoroTimer.tsx
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlay, faX, faRotateLeft, faStickyNote } from '@fortawesome/free-solid-svg-icons';
+import { faPlay, faX, faRotateLeft, faMinus, faPlus, faNoteSticky } from '@fortawesome/free-solid-svg-icons';
 import React, { useState, useEffect, useRef } from 'react';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
@@ -20,7 +20,7 @@ const PomodoroTimer: React.FC<Props> = ({ onTimerStart, onTimerFinish, onTimerSt
   const [isCustomTime, setIsCustomTime] = useState(false);
   const [customTime, setCustomTime] = useState('');
   const [halfwayAlertTriggered, setHalfwayAlertTriggered] = useState(false);
-  const [showNotes, setShowNotes] = useState(false);
+  const [showNotes, setShowNotes] = useState(true);
   const timerRef = useRef<number | null>(null);
 
   const toggleNotes = () => {
@@ -104,47 +104,98 @@ const PomodoroTimer: React.FC<Props> = ({ onTimerStart, onTimerFinish, onTimerSt
   const timerContainerStyle: React.CSSProperties = {
     backgroundColor: '#F8F9FF',
     padding: '20px',
-    borderRadius: '8px',
+    borderRadius: '10px',
     boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
     display: 'flex',
-    flexDirection: 'column',
+    justifyContent: 'space-between',
     alignItems: 'center',
+    height: '250px',
   };
 
   const timerCircleStyle: React.CSSProperties = {
-    position: 'relative',
-    width: '200px',
-    height: '200px',
-    borderRadius: '50%',
-    backgroundColor: '#fff',
+    width: '184px',
+    height: '224px',
+    backgroundColor: '#D7E3F8',
+    borderRadius: '10px',
     display: 'flex',
+    flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: '16px',
   };
 
   const timerTextStyle: React.CSSProperties = {
-    fontSize: '32px',
-    fontWeight: 'bold',
+    fontFamily: 'sans-serif',
+    fontSize: '35px',
+    fontWeight: 400,
     color: '#38608F',
+    position: 'absolute',
+    bottom: '40%',
+    right: '22%'
   };
 
   const timerButtonStyle: React.CSSProperties = {
-    padding: '8px 16px',
+    width: '30px',
+    height: '30px',
     backgroundColor: '#38608F',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '4px',
+    color: '#F8F9FF',
+    border: '2px solid #38608F',
+    borderRadius: '50%',
     cursor: 'pointer',
-    marginRight: '8px',
   };
 
   return (
     <div style={timerContainerStyle}>
+
+      {/* Circular Timer */}
       <div style={timerCircleStyle}>
-        <div style={timerTextStyle}>{formatTime(time)}</div>
+
+        {/* Top Buttons */}
+        <div style={{display: 'flex', justifyContent: 'space-between', width: '100%', padding: '0 4px'}}>
+          <button style={{...timerButtonStyle, width: '30px', height: '30px' }} onClick={decrementTimer}>
+            <FontAwesomeIcon icon={faMinus} />
+          </button>
+
+          <button style={{...timerButtonStyle, width: '30px', height: '30px' }} onClick={incrementTimer}>
+            <FontAwesomeIcon icon={faPlus} />
+          </button>
+        </div>
+
+        {/* Circle */}
+        <div style={{width: '159px', height: '159px', position: 'relative'}} onClick={() => setIsCustomTime(true)}>
+          <CircularProgressbar
+            value={(time % 3600) / 60}
+            styles={
+              buildStyles({
+              pathColor: '#38608F',
+              trailColor: '#FFFFFF',
+            })}
+          />
+          <div style={timerTextStyle}>{formatTime(time)}</div>
+        </div>
+      
+        {/* Bottom Buttons */}
+        <div style={{display: 'flex', justifyContent: 'space-between', width: '100%', padding: '0 4px'}}>
+          {!isRunning ? (
+            <div>
+              <button style={timerButtonStyle} onClick={startTimer}>
+                <FontAwesomeIcon icon={faPlay} />
+              </button>
+            </div>
+          ) : <div>
+              <button style={timerButtonStyle} onClick={stopTimer}>
+                <FontAwesomeIcon icon={faX} />
+              </button>
+            </div>}
+
+            <button style={timerButtonStyle} onClick={resetTimer}>
+              <FontAwesomeIcon icon={faRotateLeft} />
+            </button>
+        </div>
+
       </div>
-      {isCustomTime ? (
+
+      {/* set custom time window */}
+      {isCustomTime && (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
           <input
             type="number"
@@ -164,69 +215,29 @@ const PomodoroTimer: React.FC<Props> = ({ onTimerStart, onTimerFinish, onTimerSt
           <button onClick={handleCustomTimeSubmit} style={{ padding: '8px 16px', borderRadius: '4px', backgroundColor: '#38608F', color: 'white', border: 'none', cursor: 'pointer', fontSize: '16px' }}>
             Set
           </button>
-        </div>
-      ) : (
-        <div onClick={() => setIsCustomTime(true)}>
-          <CircularProgressbar
-            value={(time % 3600) / 60}
-            text={formatTime(time)}
-            styles={buildStyles({
-              textColor: '#3A2723',
-              pathColor: '#3A2723',
-              trailColor: '#38608F',
-            })}
-          />
-        </div>
-      )}
-      <button style={{ position: 'absolute', top: '0px', left: '0px', ...timerButtonStyle, width: '30px', height: '30px' }} onClick={decrementTimer}>
-        -5
-      </button>
-      <button style={{ position: 'absolute', top: '0px', right: '0px', ...timerButtonStyle, width: '30px', height: '30px' }} onClick={incrementTimer}>
-        +5
-      </button>
-      {!isRunning && (
-        <div style={{ marginTop: '20px' }}>
-          <button style={timerButtonStyle} onClick={startTimer}>
-            <FontAwesomeIcon icon={faPlay} />
-          </button>
-        </div>
-      )}
-      <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'space-between', borderRadius: '50%' }}>
-        <button style={timerButtonStyle} onClick={stopTimer}>
-          <FontAwesomeIcon icon={faX} />
-        </button>
-        <button style={timerButtonStyle} onClick={resetTimer}>
-          <FontAwesomeIcon icon={faRotateLeft} />
-        </button>
-      </div>
-      <div
-        style={{
-          position: 'relative',
-          width: showNotes ? '300px' : '40px',
-          backgroundColor: '#38608F',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          cursor: 'pointer',
-          transition: 'width 0.3s ease-out',
-        }}
-        onClick={toggleNotes}
-      >
-        <FontAwesomeIcon icon={faStickyNote} style={{ color: 'white', fontSize: '20px' }} />
-      </div>
-      {showNotes && (
-        <div style={{ position: 'absolute', top: '0', left: '0', width: '100%', backgroundColor: 'white', padding: '10px', zIndex: 1 }}>
-          <h3> Goal: {goal}</h3>
-          <h4>Tasks:</h4>
-          <ul>
-            {subtaskList.map((subtask, index) => (
-              <li key={index}>{subtask}</li>
-            ))}
-          </ul>
-          <QuickNotes onClose={toggleNotes} />
-        </div>
-      )}
-    </div>
+        </div>)} 
+     
+{/* ShowNotes Button and Div */}
+      
+          {showNotes ? 
+          (<div style={{ padding: '10px' }}> 
+            <QuickNotes onClose={toggleNotes} /></div>) :
+          <div
+            style={{
+              backgroundColor: '#38608F',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              transition: 'width 0.3s ease-out',
+              padding: '4px'
+            }}
+            onClick={toggleNotes}
+          ><FontAwesomeIcon icon={faNoteSticky} style={{ color: 'white', fontSize: '20px' }} />
+          </div>
+          }
+        
+  </div>
   );
 };
 

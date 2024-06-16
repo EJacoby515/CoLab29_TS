@@ -86,15 +86,25 @@ function (request, sender, sendResponse) {
 
     else if (request.action === "fetchAssessment") {
       const { sunday } = request;
-
-      chrome.storage.sync.get(["focusData"], (result) => {
-        const existingData = result.focusData || {};
-        const assessments = existingData.assessments || {};
-
-        sendResponse(assessments[sunday]);
-      });
-      return true;
+    
+      try {
+        chrome.storage.sync.get(["focusData"], (result) => {
+          const existingData = result.focusData || {};
+          const assessments = existingData.assessments || {};
+    
+          if (assessments[sunday]) {
+            sendResponse(assessments[sunday]);
+          } else {
+            sendResponse(null);
+          }
+        });
+      } catch (error) {
+        console.error("Error fetching assessments:", error);
+        sendResponse(null);
+      }
+      return true; // This is necessary to indicate asynchronous response
     }
+    
 
     else if (request.action === "appendAssessment") {
       const { weekKey, dayOfWeek, assessment } = request;

@@ -135,7 +135,6 @@ const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro, setGoal, s
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
-    alignItems: 'center',
     backgroundColor: '#F8F9FF',
     borderRadius: '12px',
     border: '1px solid #D0D5DD',
@@ -192,8 +191,8 @@ const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro, setGoal, s
     fontWeight: 400,
     fontSize: '14px',
     lineHeight: '16px',
-    margin: '10px auto',
-    padding: 0
+    margin: '10px',
+    padding: 0,
   } as React.CSSProperties;
 
   const inputStyle ={
@@ -242,7 +241,8 @@ const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro, setGoal, s
     textAlign: 'center',
     fontSize: '24px',
     position: 'absolute',
-    bottom: 10
+    bottom: 10,
+    alignSelf: 'center'
   } as React.CSSProperties;
 
   useEffect( () => {
@@ -275,7 +275,7 @@ const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro, setGoal, s
         {/* start screen */}
         {screen === 0 && (
           <>
-            <p style={{...pStyle, fontWeight: 800}}>Let's set up your goal!</p>
+            <p style={{...pStyle, fontWeight: 800, margin: '10px auto'}}>Let's set up your goal!</p>
             <button 
               style={{...continueBtnStyle}} 
               onClick={() => {setScreen(1)}}>
@@ -287,8 +287,9 @@ const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro, setGoal, s
         {/* set goal and date if desired */}
         {screen === 1 && ( 
             <>
-              <p style={{...pStyle, textAlign: 'left'}}>Let's break it down backwards. </p>
-              <p style={{...pStyle, color: '#22191A', fontSize: '14px'}}>What would you like to accomplish?<br/>A good goal is one that is clearly defined, achievable, and meaningful.</p>
+              <p style={{...pStyle, fontWeight: 500}}>Let's break it down backwards. </p>
+              <p style={{...pStyle, color: '#22191A', fontSize: '14px'}}>What would you like to accomplish?</p>
+              <p style={{...pStyle, color: '#22191A', fontSize: '14px'}}>A good goal is one that is clearly defined, achievable, and meaningful.</p>
               <textarea 
                 style={{...inputStyle, height: '64px'}} 
                 value={goal} 
@@ -301,47 +302,44 @@ const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro, setGoal, s
             </>
           )}
 
-          {/* Set subtasks */}
-          {screen > 1 && ( 
-          <>
-            <p style={{...goalStyle}}>I will <span style={{fontWeight: 800, textDecoration: 'underline', fontStyle: 'italic'}}> {goal}</span>.</p>
-
-            <ol style={{ height: '300px', overflow: 'scroll', paddingLeft: '0'}}>
-              {subtasksList && subtasksList.map((task, idx) => (
-                <li 
-                  key={idx} 
-                  style={{...subtaskStyle, border: subtaskSelected === idx ? '2px solid black' : '1px solid #C3C6CF'}}
-                  onClick={() => {selectSubtask(idx)}}
-                 >
-                  <p style={{...pStyle}}>{task}</p>
-                  <div>
-                    <button 
-                      style={{...addBtnStyle, border: 'none', alignSelf: 'center'}}>
-                        <FontAwesomeIcon icon={faPen} />
-                    </button>
-                    <button 
-                      style={{...addBtnStyle, border: 'none', alignSelf:'center'}} onClick={() => removeSubtask(idx)}>
-                      <FontAwesomeIcon icon={faTrashCan} />
-                    </button>
-                  </div>
-                </li>
-              ))}
-            </ol>
-
-          </>
-          )}
+        {/* Set Subtasks */}
 
         {screen === 2 && (
           <>
-            {subtasksList.length < 6 &&
+            <p style={{...goalStyle}}>I will <span style={{fontWeight: 800, textDecoration: 'underline', fontStyle: 'italic'}}> {goal}</span>.</p>
+            <p style={{...pStyle, color: '#22191A', fontSize: '14px'}}>List the steps you think you'll need. You will have a chance to add more later.</p>
+            {subCount < 2 && 
+              <p style={{...pStyle, color: '#22191A', fontSize: '14px'}}>We will be utilizing the Pomodoro technique (typically 25 minutes followed by a 5 minute break) to help break down the goal into manageable steps, making it easier to stay focused and productive.</p>}
+            
+            <ol style={{ height: '300px', overflow: 'scroll', paddingLeft: '0'}}>
+            {subtasksList && subtasksList.map((task, idx) => (
+              <li 
+                key={idx} 
+                style={{...subtaskStyle, border: subtaskSelected === idx ? '2px solid black' : '1px solid #C3C6CF'}}
+                onClick={() => {selectSubtask(idx)}}
+              >
+                <p style={{...pStyle}}>{task}</p>
+                <div>
+                  <button 
+                    style={{...addBtnStyle, border: 'none', alignSelf: 'center'}}>
+                      <FontAwesomeIcon icon={faPen} />
+                  </button>
+                  <button 
+                    style={{...addBtnStyle, border: 'none', alignSelf:'center'}} onClick={() => removeSubtask(idx)}>
+                    <FontAwesomeIcon icon={faTrashCan} />
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ol>
+            
+            {subtasksList.length < 10 &&
             <>
-              <p style={{...pStyle, color: '#22191A', fontSize: '14px'}}>List the steps you think you'll need. You will have a chance to add more later.</p>
-              <p style={{...pStyle, color: '#22191A', fontSize: '14px'}}>We will be utilizing the Pomodoro technique (typically 25 minutes followed by a 5 minute break) to help break down the goal into manageable steps, making it easier to stay focused and productive.</p>
               <div style={{...stepStyle}}>
                 <input 
                   style={{...inputStyle, height: '30px'}} 
-                  placeholder={`Step ${subCount} example: Find a list of 100 basic French words`} 
-                  value={subtask} 
+                  placeholder="Subtask:"
+                  value={subtask}
                   onChange={handleSubChange}
                   onKeyDown={(e)=> { if (e.key === "Enter") {addSubtask(subtask)}}}
                   maxLength={100}
@@ -350,6 +348,7 @@ const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro, setGoal, s
               </div>
             </>
             }
+
             <button 
               disabled={isSubButtonDisabled} 
               style={{...continueBtnStyle, opacity: isSubButtonDisabled ? '.33' : '1'}} onClick={handleSubtasksSubmit}>
@@ -359,10 +358,36 @@ const GoalInput: React.FC<Props> = ({ setShowPencil, setShowPomodoro, setGoal, s
 
         )}
 
+        {/* Final goal/subtask display */}
+
         {screen === 3 && (
           <>
-          <p style={{...pStyle}}>Great! Let's get started!</p>
-          <div>
+          <p style={{...goalStyle}}>I will <span style={{fontWeight: 800, textDecoration: 'underline', fontStyle: 'italic'}}> {goal}</span>.</p>
+
+          <ol style={{ height: '300px', overflow: 'scroll', paddingLeft: '0'}}>
+            {subtasksList && subtasksList.map((task, idx) => (
+              <li 
+                key={idx} 
+                style={{...subtaskStyle, border: subtaskSelected === idx ? '2px solid black' : '1px solid #C3C6CF'}}
+                onClick={() => {selectSubtask(idx)}}
+              >
+                <p style={{...pStyle}}>{task}</p>
+                <div>
+                  <button 
+                    style={{...addBtnStyle, border: 'none', alignSelf: 'center'}}>
+                      <FontAwesomeIcon icon={faPen} />
+                  </button>
+                  <button 
+                    style={{...addBtnStyle, border: 'none', alignSelf:'center'}} onClick={() => removeSubtask(idx)}>
+                    <FontAwesomeIcon icon={faTrashCan} />
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ol>
+
+          <p style={{...pStyle, margin: '10px auto'}}>Great! Let's get started!</p>
+          <div style={{margin: '0 auto'}}>
             <button style={{...continueBtnStyle}} onClick={handleStartTimer}>Continue</button>
           </div>
           </>
