@@ -40,6 +40,7 @@ const FloatingMenuButton: React.FC<Props> = () => {
   const [userStatus, setUserStatus] = useState<'returning'|'onboarding'|''>('');
   const [assessments, setAssessments] = useState<{ [week: string]: { [day: number]: Assessment[] } }>({});
   const [showCongratulationsAnimation, setShowCongratulationAnimation] = useState(false);
+  const shouldShowAssessment = goal !== '' && IsTimerStarted;
 
 
   const getUserStatus = async () => {
@@ -223,11 +224,11 @@ const FloatingMenuButton: React.FC<Props> = () => {
               ...iconButtonStyle,
               bottom:'20px',
               right: '90px',
-              pointerEvents: showPomodoro ? 'none' : 'auto',
-              opacity: showPomodoro ? 0.5: 1,
+              pointerEvents: showPomodoro || showPrePomodoro ? 'none' : 'auto',
+              opacity: showPomodoro || showPrePomodoro ? 0.5: 1,
             }}
             onClick={handlePomodoroClick}
-            disabled ={showPomodoro}
+            disabled ={showPomodoro || showPrePomodoro}
           >
             <FontAwesomeIcon icon={faHourglassHalf} />
           </button>
@@ -276,7 +277,7 @@ const FloatingMenuButton: React.FC<Props> = () => {
           subtaskList={subtaskList}/>
         </div>
       )}
-  {showAssessment && (
+  {showAssessment && shouldShowAssessment &&(
     <Assessment
       onAssessmentSubmit={handleAssessmentSubmit}
       assessment={assessments[getStartOfWeek(new Date())]?.[new Date().getDay()]?.[0] || { rating: 0, reflection: '' }}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlay, faPencilAlt, faRepeat, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faPlay, faPencilAlt, faRepeat, faPlus, faCheck } from '@fortawesome/free-solid-svg-icons';
 import PomodoroTimer from '../PomodoroTimer/PomodoroTimer';
 import Assessment, { AssessmentData } from '../Assessment/Assessment';
 
@@ -26,6 +26,7 @@ const PrePomodoro: React.FC<Props> = ({ goal, subtasksList, onSubtaskClick, hand
   const [subtasks, setSubtasks] = useState<Subtask[]>([]);
   const [activeSubtask, setActiveSubtask] = useState<Subtask | null>(null);
   const [editMode, setEditMode] = useState<number | null>(null);
+  const [showPomodoroTimer, setShowPomodoroTimer] = useState(false);
 
   useEffect(() => {
     setSubtasks(subtasksList.map((title: string, index: number) => ({ id: index, title, completed: false, started: false })));
@@ -36,7 +37,7 @@ const PrePomodoro: React.FC<Props> = ({ goal, subtasksList, onSubtaskClick, hand
     const allSubtasksCompleted = subtasks.every((subtask) => subtask.completed);
 
     if (anySubtaskStarted && allSubtasksCompleted) {
-      setShowAssessment(true);
+      setShowAssessment(false);
     } else {
       setShowAssessment(false);
     }
@@ -74,6 +75,10 @@ const PrePomodoro: React.FC<Props> = ({ goal, subtasksList, onSubtaskClick, hand
       return st;
     });
     setSubtasks(updatedSubtasks);
+
+    if (updatedSubtasks.every((subtask) => subtask.completed)) {
+      setShowAssessment(false);
+    }
   };
 
   const handleRedoSubtask = (subtask: Subtask) => {
@@ -101,6 +106,15 @@ const PrePomodoro: React.FC<Props> = ({ goal, subtasksList, onSubtaskClick, hand
   const handleEditSubtask = (id: number) => {
     setEditMode(id);
   };
+
+  const handleStartPomodoroTimer = () => {
+    setShowPomodoroTimer(true);
+    handleTimerStart();
+  }
+
+  const handleEndSession = () => {
+    setShowAssessment(true);
+  }
 
   const containerStyle: React.CSSProperties = {
     display: 'flex',
@@ -188,66 +202,98 @@ const PrePomodoro: React.FC<Props> = ({ goal, subtasksList, onSubtaskClick, hand
   };
 
   return (
-      <div style={containerStyle}>
+    <div style={containerStyle}>
       {showAssessment ? (
         <Assessment
-        onAssessmentSubmit={(assessment: AssessmentData) => handleAssessmentSubmit(assessment)}
-        assessment={{ rating: 0, reflection: '' }} />
+          onAssessmentSubmit={(assessment: AssessmentData) => handleAssessmentSubmit(assessment)}
+          assessment={{ rating: 0, reflection: '' }}
+        />
       ) : (
         <>
-          <h2 style={goalStyle}>{goal}</h2>
-          {activeSubtask ? (
-            <PomodoroTimer
-              onTimerStart={handleTimerStart}
-              onTimerFinish={() => handleSubtaskCompleted(activeSubtask)}
-              onTimerStop={handleTimerStop}
-              subtaskTitle={activeSubtask.title}
-              subtaskList={[]}
-              goal={goal}
-            />
+          {showPomodoroTimer ? (
+            <div style={{ ...containerStyle, width: '300x' }}>
+              <button
+                onClick={() => setShowPomodoroTimer(false)}
+                style={{ ...buttonStyle, position: 'absolute', top: '10px', left: '10px' }}
+              >
+                Back
+              </button>
+              <PomodoroTimer
+                onTimerStart={handleTimerStart}
+                onTimerFinish={() => {
+                  setShowPomodoroTimer(false);
+                  if (activeSubtask) {
+                    handleSubtaskCompleted(activeSubtask);
+                  }
+                }}
+                onTimerStop={() => {
+                  setShowPomodoroTimer(false);
+                  handleTimerStop();
+                }}
+                subtaskTitle={activeSubtask ? activeSubtask.title : ''}
+                subtaskList={[]}
+                goal={goal}
+              />
+            </div>
           ) : (
             <>
-              {subtasks.map((subtask) => (
-                <div key={subtask.id} style={subtaskContainerStyle}>
-                  <div style={subtaskTitleStyle}>
-                    {editMode === subtask.id ? (
-                      <input
-                        type="text"
-                        value={subtask.title}
-                        onChange={(e) => handleSubtaskChange(subtask.id, e.target.value)}
-                        style={inputStyle}
-                        autoFocus
-                      />
-                    ) : (
-                      <span style={subtask.completed ? completedStyle : undefined}>{subtask.title}</span>
-                    )}
-                  </div>
-                  <div style={subtaskButtonsStyle}>
-                    <button onClick={() => handleSubtaskClick(subtask)} style={buttonStyle}>
-                      <FontAwesomeIcon icon={faPlay}  /> Start Timer
-                    </button>
-                    <button onClick={() => handleEditSubtask(subtask.id)} style={buttonStyle}>
-                       <FontAwesomeIcon icon={faPencilAlt} /> Edit Task
-                    </button>
-                    {subtask.completed && (
-                      <button onClick={() => handleRedoSubtask(subtask)} style={buttonStyle}>
-                        <FontAwesomeIcon icon={faRepeat} /> Repeat Task
+              <h2 style={goalStyle}>{goal}</h2>
+              <div>
+                {subtasks.map((subtask) => (
+                  <div key={subtask.id} style={subtaskContainerStyle}>
+                    <div style={subtaskTitleStyle}>
+                      {editMode === subtask.id ? (
+                        <input
+                          type="text"
+                          value={subtask.title}
+                          onChange={(e) => handleSubtaskChange(subtask.id, e.target.value)}
+                          style={inputStyle}
+                          autoFocus
+                        />
+                      ) : (
+                        <span style={subtask.completed ? completedStyle : undefined}>{subtask.title}</span>
+                      )}
+                    </div>
+                    <div style={subtaskButtonsStyle}>
+                      <button
+                        onClick={() => {
+                          setActiveSubtask(subtask);
+                          setShowPomodoroTimer(true);
+                          handleTimerStart();
+                        }}
+                        style={buttonStyle}
+                      >
+                        <FontAwesomeIcon icon={faPlay} /> Start Timer
                       </button>
-                    )}
+                      <button onClick={() => handleEditSubtask(subtask.id)} style={buttonStyle}>
+                        <FontAwesomeIcon icon={faPencilAlt} /> Edit Task
+                      </button>
+                      {subtask.completed && (
+                        <button onClick={() => handleRedoSubtask(subtask)} style={buttonStyle}>
+                          <FontAwesomeIcon icon={faRepeat} /> Repeat Task
+                        </button>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
-              <button onClick={handleTimerStart} style={addButtonStyle}>
-                Start Pomodoro Timer <FontAwesomeIcon icon={faPlay} />
-              </button>
-              <button onClick={handleAddSubtask} style={addButtonStyle}>
-                Add Subtask <FontAwesomeIcon icon={faPlus} />
-              </button>
+                ))}
+              </div>
+              <div>
+                <button onClick={handleStartPomodoroTimer} style={addButtonStyle}>
+                  Start Pomodoro Timer <FontAwesomeIcon icon={faPlay} />
+                </button>
+                <button onClick={handleAddSubtask} style={addButtonStyle}>
+                  Add Subtask <FontAwesomeIcon icon={faPlus} />
+                </button>
+                {subtasks.every((subtask) => subtask.completed) && (
+                  <button onClick={handleEndSession} style={addButtonStyle}>
+                    End Session <FontAwesomeIcon icon={faCheck} />
+                  </button>
+                )}
+              </div>
             </>
           )}
         </>
       )}
-
     </div>
   );
 };

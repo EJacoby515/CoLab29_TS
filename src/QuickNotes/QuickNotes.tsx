@@ -31,7 +31,7 @@ const QuickNotes: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
   const notesTextareaStyle: React.CSSProperties = {
     resize: 'vertical',
-    width: '250px',
+    width: '200px',
     height: '154px',
     padding: '8px',
     border: '1px solid #D0D5DD',
