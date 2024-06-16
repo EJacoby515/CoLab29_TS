@@ -23,7 +23,7 @@ const FloatingMenuButton: React.FC = () => {
   const [showPrePomodoro, setShowPrePomodoro] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [IsTimerStarted, setIsTimerStarted] = useState(false);
-  const [showAssessment, setShowAssessment] = useState(false);
+  const [showAssessment, setShowAssessment] = useState(true);
   const [goal, setGoal] = useState('');
   const [subtaskList, setSubtasksList] = useState<string[]>([]);
   const [subtaskTitle, setSubtaskTitle] = useState('');

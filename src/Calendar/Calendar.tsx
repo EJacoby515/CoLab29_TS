@@ -118,10 +118,12 @@ const Calendar: React.FC = () => {
   const nextWeek = () => {
     if (deltaWeeks < 0) {
     setdeltaWeeks(prev => prev += 1);}
+    setSelectedDay(null);
   };
   
   const previousWeek = () => {
     setdeltaWeeks(prev => prev -= 1);
+    setSelectedDay(null);
   };
 
   const calendarcontainerStyle = {

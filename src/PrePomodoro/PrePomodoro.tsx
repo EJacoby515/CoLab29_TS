@@ -129,11 +129,12 @@ const PrePomodoro: React.FC<Props> = ({ goal, subtasksList, onSubtaskClick, hand
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'stretch',
-    backgroundColor: '#F8F9FF',
+    backgroundColor: '#38608F',
     border: '1px solid #C3C6CF',
     borderRadius: '8px',
     padding: '12px 16px',
     marginBottom: '8px',
+
   };
 
   const subtaskTitleStyle: React.CSSProperties = {
