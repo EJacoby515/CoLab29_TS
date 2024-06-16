@@ -10,11 +10,13 @@ interface Props {
   onTimerStart: () => void;
   onTimerFinish: () => void;
   onTimerStop: () => void;
+  subtaskTitle: string;
   goal: string;
   subtaskList: string[];
+
 }
 
-const PomodoroTimer: React.FC<Props> = ({ onTimerStart, onTimerFinish, onTimerStop, goal, subtaskList }) => {
+const PomodoroTimer: React.FC<Props> = ({ onTimerStart, onTimerFinish, onTimerStop, goal, subtaskTitle, subtaskList }) => {
   const [time, setTime] = useState(1500);
   const [isRunning, setIsRunning] = useState(false);
   const [isCustomTime, setIsCustomTime] = useState(false);
@@ -101,7 +103,19 @@ const PomodoroTimer: React.FC<Props> = ({ onTimerStart, onTimerFinish, onTimerSt
     return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
   };
 
+  const timerHeaderStyle:  React.CSSProperties =  {
+    fontSize: '24px',
+    fontWeight:  'bold',
+    marginBottom: '16px',
+    color: '#38608F',
+  }
+
   const timerContainerStyle: React.CSSProperties = {
+    position: 'fixed',
+    bottom: '160px',
+    right: '160px',
+    transform: 'scale(1)',
+    transition: 'all 0.8s ease-in-out',
     backgroundColor: '#F8F9FF',
     padding: '20px',
     borderRadius: '10px',
@@ -194,7 +208,7 @@ const PomodoroTimer: React.FC<Props> = ({ onTimerStart, onTimerFinish, onTimerSt
 
       </div>
 
-      {/* set custom time window */}
+      <h3 style={timerHeaderStyle}>{subtaskTitle}</h3>
       {isCustomTime && (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
           <input
