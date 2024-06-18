@@ -1,13 +1,13 @@
 {
   "manifest_version": 3,
-  "name": "deepFocus Chrome Extension",
+  "name": "FLO",
   "version": "1.0",
-  "description": "Study better with goal setting and review and timed sessions",
+  "description": "Enhance productivity and thrive with FLO. Embrace reflective learning, improve focus, and bring calmness to your workday by having a north star.",
   "action": {
     "default_icon": {
-      "16": "icon.png",
-      "48": "icon.png",
-      "128": "icon.png"
+      "16": "/public/icon.png",
+      "48": "/public/icon.png",
+      "128": "/public/icon.png"
     }
   },
   "background": {
