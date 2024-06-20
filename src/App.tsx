@@ -6,7 +6,14 @@ const App: React.FC = () => {
   const handleAssessmentSubmit = (assessment: AssessmentData) => {
     console.log('Assessment Submitted: ', assessment);
   }
-  return <FloatingMenuButton handleAssessmentSubmit={handleAssessmentSubmit} />;
+
+  const handleBackClick = () => {
+    console.log('Back button clicked');
+  }
+  return <FloatingMenuButton 
+  handleAssessmentSubmit={handleAssessmentSubmit}
+  handleBackClick={handleBackClick}
+  />;
 };
 
 export default App;

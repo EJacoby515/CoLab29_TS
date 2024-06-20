@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlay, faPencilAlt, faRepeat, faPlus, faCheck } from '@fortawesome/free-solid-svg-icons';
+import { faPlay, faPencilAlt, faRepeat, faPlus, faCheck, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import PomodoroTimer from '../PomodoroTimer/PomodoroTimer';
 import Assessment, { AssessmentData } from '../Assessment/Assessment';
 
@@ -10,10 +10,12 @@ interface Props {
   onSubtaskClick: (subtask: Subtask) => void;
   handleTimerStart: () => void;
   handleTimerStop: () => void;
+  
   showAssessment: boolean;
   setShowAssessment: React.Dispatch<React.SetStateAction<boolean>>;
   handleAssessmentSubmit: (assessment: AssessmentData) => void;
   assessment: { [week: string]: { [day: number]: AssessmentData[] } };
+  
 }
 interface Subtask {
   id: number;
@@ -112,9 +114,19 @@ const PrePomodoro: React.FC<Props> = ({ goal, subtasksList, onSubtaskClick, hand
     handleTimerStart();
   }
 
+  const handleTimerFinish = () => {
+    setShowPomodoroTimer(false);
+    if (activeSubtask) {
+      handleSubtaskCompleted(activeSubtask);
+    }
+    setShowAssessment(true);
+  };
+
   const handleEndSession = () => {
     setShowAssessment(true);
   }
+  
+ 
 
   const containerStyle: React.CSSProperties = {
     display: 'flex',
@@ -126,10 +138,24 @@ const PrePomodoro: React.FC<Props> = ({ goal, subtasksList, onSubtaskClick, hand
     backgroundColor: '#F8F9FF',
     borderRadius: '12px',
     boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-    width: '500px',
+    width: '450px',
     height: '500px',
     border: '1px solid #D0D5DD',
     fontFamily: 'Inter, sans-serif',
+    position: 'relative', 
+  };
+
+  const backButtonStyle: React.CSSProperties = {
+    backgroundColor: 'transparent',
+    border: 'none',
+    color: '#38608F',
+    cursor: 'pointer',
+    fontSize: '24px',
+    padding: '0',
+    margin: '0',
+    position: 'absolute', 
+    top: '10px',
+    left: '10px',
   };
 
   const goalStyle: React.CSSProperties = {
@@ -211,25 +237,13 @@ const PrePomodoro: React.FC<Props> = ({ goal, subtasksList, onSubtaskClick, hand
       ) : (
         <>
           {showPomodoroTimer ? (
-            <div style={{ ...containerStyle, width: '300x' }}>
-              <button
-                onClick={() => setShowPomodoroTimer(false)}
-                style={{ ...buttonStyle, position: 'absolute', top: '10px', left: '10px' }}
-              >
-                Back
+            <div style={{ width: '300px', height: '400px', margin: '0 auto' }}>
+              <button style={backButtonStyle} onClick={() => setShowPomodoroTimer(false)}>
+                <FontAwesomeIcon icon={faArrowLeft} />
               </button>
               <PomodoroTimer
                 onTimerStart={handleTimerStart}
-                onTimerFinish={() => {
-                  setShowPomodoroTimer(false);
-                  if (activeSubtask) {
-                    handleSubtaskCompleted(activeSubtask);
-                  }
-                }}
-                onTimerStop={() => {
-                  setShowPomodoroTimer(false);
-                  handleTimerStop();
-                }}
+                onTimerFinish={handleTimerFinish}
                 subtaskTitle={activeSubtask ? activeSubtask.title : ''}
                 subtaskList={[]}
                 goal={goal}
@@ -299,3 +313,4 @@ const PrePomodoro: React.FC<Props> = ({ goal, subtasksList, onSubtaskClick, hand
 };
 
 export default PrePomodoro;
+

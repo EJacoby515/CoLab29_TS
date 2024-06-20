@@ -1,6 +1,6 @@
 // PomodoroTimer.tsx
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlay, faX, faRotateLeft, faMinus, faPlus, faNoteSticky } from '@fortawesome/free-solid-svg-icons';
+import { faPlay, faX, faRotateLeft, faMinus, faPlus, faNoteSticky, faPause, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import React, { useState, useEffect, useRef } from 'react';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
@@ -8,15 +8,14 @@ import QuickNotes from '../QuickNotes/QuickNotes';
 
 interface Props {
   onTimerStart: () => void;
-  onTimerFinish: () => void;
-  onTimerStop: () => void;
+  onTimerFinish: () => void
   subtaskTitle: string;
   goal: string;
   subtaskList: string[];
 
 }
 
-const PomodoroTimer: React.FC<Props> = ({ onTimerStart, onTimerFinish, onTimerStop, goal, subtaskTitle, subtaskList }) => {
+const PomodoroTimer: React.FC<Props> = ({ onTimerStart, onTimerFinish, goal, subtaskTitle, subtaskList }) => {
   const [time, setTime] = useState(1500);
   const [isRunning, setIsRunning] = useState(false);
   const [isCustomTime, setIsCustomTime] = useState(false);
@@ -40,7 +39,6 @@ const PomodoroTimer: React.FC<Props> = ({ onTimerStart, onTimerFinish, onTimerSt
       window.clearInterval(timerRef.current!);
     }
     setIsRunning(false);
-    onTimerStop();
   };
 
   const resetTimer = () => {
@@ -67,6 +65,8 @@ const PomodoroTimer: React.FC<Props> = ({ onTimerStart, onTimerFinish, onTimerSt
       setIsCustomTime(false);
     }
   };
+
+
 
   useEffect(() => {
     if (isRunning) {
@@ -106,35 +106,37 @@ const PomodoroTimer: React.FC<Props> = ({ onTimerStart, onTimerFinish, onTimerSt
   const timerHeaderStyle:  React.CSSProperties =  {
     fontSize: '24px',
     fontWeight:  'bold',
-    marginBottom: '16px',
+    marginBottom: '20px',
+    textAlign:  'center',
     color: '#38608F',
   }
 
   const timerContainerStyle: React.CSSProperties = {
     position: 'fixed',
-    bottom: '160px',
-    right: '160px',
-    transform: 'scale(1)',
-    transition: 'all 0.8s ease-in-out',
+    bottom: '150px',
+    right: '100px',
     backgroundColor: '#F8F9FF',
     padding: '20px',
     borderRadius: '10px',
     boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
     display: 'flex',
-    justifyContent: 'space-between',
+    flexDirection: 'column',
     alignItems: 'center',
-    height: '250px',
+    justifyContent: 'center',
+    width: '300px',
+    height: '240px',
   };
 
   const timerCircleStyle: React.CSSProperties = {
-    width: '184px',
-    height: '224px',
+    width: '200px',
+    height: '200px',
     backgroundColor: '#D7E3F8',
-    borderRadius: '10px',
+    borderRadius: '50px',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
+    marginBlock: '20px',
   };
 
   const timerTextStyle: React.CSSProperties = {
@@ -152,20 +154,25 @@ const PomodoroTimer: React.FC<Props> = ({ onTimerStart, onTimerFinish, onTimerSt
     height: '30px',
     backgroundColor: '#38608F',
     color: '#F8F9FF',
-    border: '2px solid #38608F',
+    border: 'none',
     borderRadius: '50%',
     cursor: 'pointer',
+    margin: '5px'
   };
+
+  
 
   return (
     <div style={timerContainerStyle}>
+<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+      <h3 style={timerHeaderStyle}>{subtaskTitle}</h3>
 
       {/* Circular Timer */}
       <div style={timerCircleStyle}>
 
         {/* Top Buttons */}
-        <div style={{display: 'flex', justifyContent: 'space-between', width: '100%', padding: '0 4px'}}>
-          <button style={{...timerButtonStyle, width: '30px', height: '30px' }} onClick={decrementTimer}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', padding: '0 4px'}}>
+          <button style={{...timerButtonStyle, width: '30px', height: '30px'}} onClick={decrementTimer}>
             <FontAwesomeIcon icon={faMinus} />
           </button>
 
@@ -175,7 +182,7 @@ const PomodoroTimer: React.FC<Props> = ({ onTimerStart, onTimerFinish, onTimerSt
         </div>
 
         {/* Circle */}
-        <div style={{width: '159px', height: '159px', position: 'relative'}} onClick={() => setIsCustomTime(true)}>
+        <div style={{ width: '159px', height: '159px', position: 'relative'}} onClick={() => setIsCustomTime(true)}>
           <CircularProgressbar
             value={(time % 3600) / 60}
             styles={
@@ -188,7 +195,7 @@ const PomodoroTimer: React.FC<Props> = ({ onTimerStart, onTimerFinish, onTimerSt
         </div>
       
         {/* Bottom Buttons */}
-        <div style={{display: 'flex', justifyContent: 'space-between', width: '100%', padding: '0 4px'}}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', padding: '0 4px'}}>
           {!isRunning ? (
             <div>
               <button style={timerButtonStyle} onClick={startTimer}>
@@ -197,7 +204,7 @@ const PomodoroTimer: React.FC<Props> = ({ onTimerStart, onTimerFinish, onTimerSt
             </div>
           ) : <div>
               <button style={timerButtonStyle} onClick={stopTimer}>
-                <FontAwesomeIcon icon={faX} />
+                <FontAwesomeIcon icon={faPause} />
               </button>
             </div>}
 
@@ -207,8 +214,6 @@ const PomodoroTimer: React.FC<Props> = ({ onTimerStart, onTimerFinish, onTimerSt
         </div>
 
       </div>
-
-      <h3 style={timerHeaderStyle}>{subtaskTitle}</h3>
       {isCustomTime && (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
           <input
@@ -247,10 +252,11 @@ const PomodoroTimer: React.FC<Props> = ({ onTimerStart, onTimerFinish, onTimerSt
               padding: '4px'
             }}
             onClick={toggleNotes}
-          ><FontAwesomeIcon icon={faNoteSticky} style={{ color: 'white', fontSize: '20px' }} />
+          ><FontAwesomeIcon icon={faNoteSticky} style={{ color: 'white', fontSize: '20px'}} />
           </div>
           }
         
+  </div>
   </div>
   );
 };

@@ -9,6 +9,11 @@ import Alert from '../Alert/Alert';
 import PrePomodoro from '../PrePomodoro/PrePomodoro';
 import CongratulationAnimation from '../CongratulationAnimation/CongratulationAnimation';
 
+
+interface Props {
+  handleAssessmentSubmit: (assessment: Assessment) => void;
+  handleBackClick: () => void;
+}
 interface Subtask {
   id: number;
   title: string;
@@ -18,10 +23,6 @@ interface Subtask {
 interface Assessment {
   rating: number;
   reflection: string;
-}
-
-interface Props {
-  handleAssessmentSubmit: (assessment: Assessment) => void;
 }
 
 
@@ -66,6 +67,11 @@ const FloatingMenuButton: React.FC<Props> = () => {
       }; 
   }
 
+  const handleBackClick = () => {
+    setShowPomodoro(false);
+    setShowPrePomodoro(true);
+  }
+
   const handleClick = () => {
     if (menuOpen === false) {
       if (userStatus === 'onboarding') 
@@ -82,6 +88,9 @@ const FloatingMenuButton: React.FC<Props> = () => {
   const handleSubtaskClick =   (subtask: Subtask) => {
     setSubtaskTitle(subtask.title);
     setShowPomodoro(true);
+    setShowPrePomodoro(false);
+    console.log('showPomodoro', true);
+    console.log('showPrePomodoro', false);
   }
 
   const handleTimerStart = () => {
@@ -119,7 +128,7 @@ const FloatingMenuButton: React.FC<Props> = () => {
 
   const handlePomodoroClick = () => {
     setShowPomodoro(!showPomodoro);
-  }
+  };
 
   const handlePencilClick = () => {
     if (userStatus === 'returning') {
@@ -180,6 +189,16 @@ const FloatingMenuButton: React.FC<Props> = () => {
     alignItems: 'center',
     justifyContent: 'center',
   } as React.CSSProperties;
+
+  const backButtonStyle: React.CSSProperties = {
+    backgroundColor: 'transparent',
+    border: 'none',
+    color: '#38608F',
+    cursor: 'pointer',
+    fontSize: '24px',
+    padding: '0',
+    margin: '0',
+  };
 
   useEffect(() => {
     getUserStatus();
@@ -244,7 +263,7 @@ const FloatingMenuButton: React.FC<Props> = () => {
           userStatus={userStatus} 
           setUserStatus={setUserStatus} 
           />)}
-      {showPrePomodoro && (
+      { showPrePomodoro && (
         <div style = {{ position: 'fixed', bottom:  '30px', right: '160px', zIndex: 1000}}>
           <PrePomodoro 
               goal = {goal} 
@@ -256,6 +275,7 @@ const FloatingMenuButton: React.FC<Props> = () => {
               setShowAssessment={setShowAssessment}
               handleAssessmentSubmit={handleAssessmentSubmit}
               assessment={assessments}
+              // onBackClick={handleBackClick} 
               />
         </div>
       )}
@@ -268,10 +288,9 @@ const FloatingMenuButton: React.FC<Props> = () => {
           transition: 'all 0.8s ease-in-out',
           zIndex: 1000,
           }}>
-          <PomodoroTimer 
+          <PomodoroTimer
           onTimerStart={handleTimerStart} 
           onTimerFinish={handleTimerFinish} 
-          onTimerStop={handleTimerStop} 
           subtaskTitle={subtaskTitle}
           goal={goal}
           subtaskList={subtaskList}/>

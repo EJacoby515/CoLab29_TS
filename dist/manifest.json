@@ -5,9 +5,9 @@
   "description": "Enhance productivity and thrive with FLO. Embrace reflective learning, improve focus, and bring calmness to your workday by having a north star.",
   "action": {
     "default_icon": {
-      "16": "/public/icon.png",
-      "48": "/public/icon.png",
-      "128": "/public/icon.png"
+      "16": "/icon.png",
+      "48": "/icon.png",
+      "128": "/icon.png"
     }
   },
   "background": {
