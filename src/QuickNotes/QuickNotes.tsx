@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleDown, faX } from '@fortawesome/free-solid-svg-icons';
+import { faCircleDown, faX, faFilePdf } from '@fortawesome/free-solid-svg-icons';
+import jsPDF from 'jspdf';
 
 const QuickNotes: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [notes, setNotes] = useState('');
@@ -19,15 +20,24 @@ const QuickNotes: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     });
   };
 
-  const convertNotes = (format: 'doc' | 'txt' | 'pdf') => {
-    chrome.runtime.sendMessage({ action: "convertQuickNotes", format }, (response) => {
-      if (response.success) {
-        console.log(`Quick notes converted to ${format} format and downloaded`);
-      } else {
-        console.error("Error converting quick notes:", response.error);
-      }
-    });
-  };
+  const convertNotesToPDF = () => {
+  const doc = new jsPDF();
+  const lines = notes.split('\n');
+
+  doc.setFontSize(12);
+  let currentLine = 1;
+
+  lines.forEach((line) => {
+    if (currentLine > 1) {
+      doc.text(line, 10, currentLine * 5);
+    } else {
+      doc.text(line, 10, 10);
+    }
+    currentLine++;
+  });
+
+  doc.save('quick_notes.pdf');
+};
 
   const notesTextareaStyle: React.CSSProperties = {
     resize: 'vertical',
@@ -59,22 +69,9 @@ const QuickNotes: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         style={notesTextareaStyle}
       />
       <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <button onClick={() => convertNotes('doc')} style={notesSaveButtonStyle}>
-          <FontAwesomeIcon icon={faCircleDown} />
+        <button onClick={convertNotesToPDF} style={notesSaveButtonStyle}>
+          <FontAwesomeIcon icon={faFilePdf} /> Download PDF
         </button>
-
-        {/* Hey Eric... I feel all the buttons are a little distracting so maybe we  just pick one file type and have that be the "download" button? */}
-
-        {/* <button onClick={() => convertNotes('txt')} style={notesSaveButtonStyle}>
-          <FontAwesomeIcon icon={faCircleDown} /> .txt
-        </button>
-        <button onClick={() => convertNotes('pdf')} style={notesSaveButtonStyle}>
-          <FontAwesomeIcon icon={faCircleDown} /> .pdf
-        </button>
-        <button onClick={saveNotes} style={notesSaveButtonStyle}>
-          Save
-        </button> */}
-
         <button onClick={onClose} style={notesSaveButtonStyle}>
           <FontAwesomeIcon icon={faX} />
         </button>

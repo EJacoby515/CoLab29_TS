@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlay, faPencilAlt, faRepeat, faPlus, faCheck, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { faPlay, faPencilAlt, faRepeat, faPlus, faCheck, faArrowLeft, faTimes } from '@fortawesome/free-solid-svg-icons';
 import PomodoroTimer from '../PomodoroTimer/PomodoroTimer';
 import Assessment, { AssessmentData } from '../Assessment/Assessment';
 
@@ -10,11 +10,11 @@ interface Props {
   onSubtaskClick: (subtask: Subtask) => void;
   handleTimerStart: () => void;
   handleTimerStop: () => void;
-  
   showAssessment: boolean;
   setShowAssessment: React.Dispatch<React.SetStateAction<boolean>>;
   handleAssessmentSubmit: (assessment: AssessmentData) => void;
   assessment: { [week: string]: { [day: number]: AssessmentData[] } };
+  onClose: () => void;
   
 }
 interface Subtask {
@@ -24,7 +24,7 @@ interface Subtask {
   started: boolean;
 }
 
-const PrePomodoro: React.FC<Props> = ({ goal, subtasksList, onSubtaskClick, handleTimerStart, handleTimerStop, showAssessment, setShowAssessment, handleAssessmentSubmit }) => {
+const PrePomodoro: React.FC<Props> = ({ goal, subtasksList, onSubtaskClick, handleTimerStart, handleTimerStop, showAssessment, setShowAssessment, handleAssessmentSubmit, onClose }) => {
   const [subtasks, setSubtasks] = useState<Subtask[]>([]);
   const [activeSubtask, setActiveSubtask] = useState<Subtask | null>(null);
   const [editMode, setEditMode] = useState<number | null>(null);
@@ -138,8 +138,8 @@ const PrePomodoro: React.FC<Props> = ({ goal, subtasksList, onSubtaskClick, hand
     backgroundColor: '#F8F9FF',
     borderRadius: '12px',
     boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-    width: '450px',
-    height: '500px',
+    width: '400px',
+    height: '550px',
     border: '1px solid #D0D5DD',
     fontFamily: 'Inter, sans-serif',
     position: 'relative', 
@@ -227,17 +227,42 @@ const PrePomodoro: React.FC<Props> = ({ goal, subtasksList, onSubtaskClick, hand
     color: 'red',
   };
 
+  const pomodoroTimerContainerStyle: React.CSSProperties={
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '400px',
+  };
+
+  const closeButtonStyle: React.CSSProperties ={
+    backgroundColor: 'transparent',
+    border: 'none',
+    color: '#38608F',
+    cursor: 'pointer',
+    fontSize: '24px',
+    padding: '0',
+    margin: '0',
+    position: 'absolute',
+    top: '10px',
+    right: '10px',
+  };
+
   return (
     <div style={containerStyle}>
       {showAssessment ? (
+        <>
         <Assessment
           onAssessmentSubmit={(assessment: AssessmentData) => handleAssessmentSubmit(assessment)}
           assessment={{ rating: 0, reflection: '' }}
         />
+        <button style={closeButtonStyle} onClick={onClose}>
+          <FontAwesomeIcon  icon={faTimes}  />
+        </button>
+        </>
       ) : (
         <>
           {showPomodoroTimer ? (
-            <div style={{ width: '300px', height: '400px', margin: '0 auto' }}>
+            <div style={pomodoroTimerContainerStyle}>
               <button style={backButtonStyle} onClick={() => setShowPomodoroTimer(false)}>
                 <FontAwesomeIcon icon={faArrowLeft} />
               </button>

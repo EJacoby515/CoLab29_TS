@@ -112,8 +112,7 @@ const PomodoroTimer: React.FC<Props> = ({ onTimerStart, onTimerFinish, goal, sub
   }
 
   const timerContainerStyle: React.CSSProperties = {
-    position: 'fixed',
-    bottom: '150px',
+    bottom: '100px',
     right: '100px',
     backgroundColor: '#F8F9FF',
     padding: '20px',
@@ -125,6 +124,7 @@ const PomodoroTimer: React.FC<Props> = ({ onTimerStart, onTimerFinish, goal, sub
     justifyContent: 'center',
     width: '300px',
     height: '240px',
+    zIndex: 1000,
   };
 
   const timerCircleStyle: React.CSSProperties = {
@@ -159,8 +159,6 @@ const PomodoroTimer: React.FC<Props> = ({ onTimerStart, onTimerFinish, goal, sub
     cursor: 'pointer',
     margin: '5px'
   };
-
-  
 
   return (
     <div style={timerContainerStyle}>
@@ -249,7 +247,8 @@ const PomodoroTimer: React.FC<Props> = ({ onTimerStart, onTimerFinish, goal, sub
               justifyContent: 'center',
               cursor: 'pointer',
               transition: 'width 0.3s ease-out',
-              padding: '4px'
+              padding: '4px',
+              width: '350px',
             }}
             onClick={toggleNotes}
           ><FontAwesomeIcon icon={faNoteSticky} style={{ color: 'white', fontSize: '20px'}} />

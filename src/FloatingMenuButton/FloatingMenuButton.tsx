@@ -138,6 +138,10 @@ const FloatingMenuButton: React.FC<Props> = () => {
     }
     };
 
+    const handleClosePrePomodoro  =() => {
+      setShowPrePomodoro(false);
+    }
+
   const handleCalendarClick = async () => {
     setShowCalendar(!showCalendar);
     try {
@@ -275,6 +279,7 @@ const FloatingMenuButton: React.FC<Props> = () => {
               setShowAssessment={setShowAssessment}
               handleAssessmentSubmit={handleAssessmentSubmit}
               assessment={assessments}
+              onClose={handleClosePrePomodoro}
               // onBackClick={handleBackClick} 
               />
         </div>
